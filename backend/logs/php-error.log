@@ -1,0 +1,56 @@
+[25-Dec-2025 09:51:58 Africa/Lagos] Extracted Fields: Array
+(
+    [name] => John Doe
+    [email] => john.doe@example.com
+    [phone] => 08012345678
+    [subject] => Admission Inquiry
+    [message] => Hello, I would like to inquire about admission requirements for my child for the upcoming academic year. Could you please send me more information about the application process and school fees?
+)
+
+[25-Dec-2025 09:51:58 Africa/Lagos] Contact saved with ID: 1
+[25-Dec-2025 09:52:03 Africa/Lagos] Contact email sent successfully
+[25-Dec-2025 09:56:05 Africa/Lagos] Extracted Fields: Array
+(
+    [full_name] => Chinedu Okoro
+    [dob] => 2011-01-05
+    [religion] => Christianity
+    [class_interest] => Creche
+    [gender] => Male
+    [address] => No. 15 Gboko Road, Makurdi
+    [nationality] => Nigeria
+    [state] => Imo
+    [city] => Owerri
+    [student_phone] => 2348123456789
+    [student_email] => chineduokoro@example.com
+    [mother_name] => Grace Okoro
+    [father_name] => James Okoro
+    [mother_phone] => 2348012345678
+    [father_phone] => 2348098765432
+    [parent_email] => okoro.family@example.com
+    [parent_address] => No. 15 Gboko Road, Makurdi
+)
+
+[25-Dec-2025 09:56:05 Africa/Lagos] Application DB Data: Array
+(
+    [:full_name] => Chinedu Okoro
+    [:dob] => 2011-01-05
+    [:religion] => Christianity
+    [:class_interest] => Creche
+    [:gender] => Male
+    [:address] => No. 15 Gboko Road, Makurdi
+    [:nationality] => Nigeria
+    [:state] => Imo
+    [:city] => Owerri
+    [:student_phone] => 2348123456789
+    [:student_email] => chineduokoro@example.com
+    [:mother_name] => Grace Okoro
+    [:father_name] => James Okoro
+    [:mother_phone] => 2348012345678
+    [:father_phone] => 2348098765432
+    [:parent_email] => okoro.family@example.com
+    [:parent_address] => No. 15 Gboko Road, Makurdi
+    [:application_id] => APP2025122552D6A8
+    [:ip_address] => 127.0.0.1
+)
+
+[25-Dec-2025 09:56:05 Africa/Lagos] Application saved successfully. ID: 1, App ID: APP2025122552D6A8

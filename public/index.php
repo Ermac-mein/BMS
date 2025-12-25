@@ -1,0 +1,511 @@
+<?php
+// This header might not be necessary if you're serving as HTML
+// header('Content-Type: text/html; charset=utf-8');
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beautiful Minds Schools - Excellence in Education</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="./assets/css/style.css">
+</head>
+
+<body>
+    <header id="header">
+        <div class="container header-container">
+            <div class="logo">
+                <img src="assets/logo.png" alt="Beautiful Minds School Logo" class="logo-image">
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#admission">Admission</a></li>
+                <li><a href="#curriculum">Curriculum</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="#" class="btn btn-apply" id="applyNavBtn">Apply Now</a>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-slider">
+            <div class="slide active">
+                <div class="slide-bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80');">
+                </div>
+                <div class="container">
+                    <div class="slide-content">
+                        <h1>Nurturing Tomorrow's Leaders</h1>
+                        <p>At Beautiful Minds Schools, we provide a holistic education that prepares students for
+                            success in a rapidly changing world.</p>
+                        <div class="hero-btns">
+                            <a href="#admission" class="btn btn-primary">Admission Requirements</a>
+                            <a href="#" class="btn btn-secondary apply-btn">Apply Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80');">
+                </div>
+                <div class="container">
+                    <div class="slide-content">
+                        <h1>Excellence in Education</h1>
+                        <p>Our dual curriculum approach combines the best of Nigerian and British educational systems.
+                        </p>
+                        <div class="hero-btns">
+                            <a href="#admission" class="btn btn-primary">Admission Requirements</a>
+                            <a href="#" class="btn btn-secondary apply-btn">Apply Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide">
+                <div class="slide-bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80');">
+                </div>
+                <div class="container">
+                    <div class="slide-content">
+                        <h1>A World-Class Learning Environment</h1>
+                        <p>State-of-the-art facilities and dedicated teaching staff create an inspiring atmosphere for
+                            students.</p>
+                        <div class="hero-btns">
+                            <a href="#admission" class="btn btn-primary">Admission Requirements</a>
+                            <a href="#" class="btn btn-secondary apply-btn">Apply Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slider-nav">
+                <button class="slider-nav-btn" id="prevSlide"><i class="fas fa-chevron-left"></i></button>
+                <button class="slider-nav-btn" id="nextSlide"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            <div class="slider-controls">
+                <div class="slider-dot active" data-slide="0"></div>
+                <div class="slider-dot" data-slide="1"></div>
+                <div class="slider-dot" data-slide="2"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <div class="section-title">
+                <h2>About Beautiful Minds Schools</h2>
+                <p>Located in the heart of Benue, Nigeria, we are committed to providing world-class education.</p>
+            </div>
+            <div class="about-content">
+                <div class="about-img">
+                    <img src="https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80"
+                        alt="School Campus">
+                </div>
+                <div class="about-text">
+                    <h3>Shaping Future Leaders Since 2005</h3>
+                    <p>Beautiful Minds School was founded with a vision to create an educational institution that would
+                        serve as a beacon of excellence in Nigeria.</p>
+                    <div class="about-features">
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+                            <div>
+                                <h4>Qualified Teachers</h4>
+                                <p>Highly trained and experienced educators.</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-flask"></i></div>
+                            <div>
+                                <h4>Modern Labs</h4>
+                                <p>State-of-the-art science and computer laboratories.</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-medal"></i></div>
+                            <div>
+                                <h4>Proven Excellence</h4>
+                                <p>Consistent outstanding results in national examinations.</p>
+                            </div>
+                        </div>
+                        <div class="feature">
+                            <div class="feature-icon"><i class="fas fa-heart"></i></div>
+                            <div>
+                                <h4>Holistic Development</h4>
+                                <p>Focus on academic, physical, and emotional growth.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="admission" class="admission">
+        <div class="container">
+            <div class="section-title">
+                <h2>Admission Requirements</h2>
+                <p>Our admissions process identifies students who will thrive in our dynamic learning environment.</p>
+            </div>
+            <div class="admission-process">
+                <h3>Journey to Becoming a Beautiful Minds Student</h3>
+                <p>We're dedicated to providing an outstanding educational experience that encourages critical thinking
+                    and personal development.</p>
+                <div class="process-steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-icon"><i class="fas fa-school"></i></div>
+                        <h4>School Tour & Open House</h4>
+                        <p>Attend Open House events or schedule a personalized school tour.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                        <h4>Application Submission</h4>
+                        <p>Submit a completed application form online or at our Admissions Office.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-icon"><i class="fas fa-edit"></i></div>
+                        <h4>Entrance Assessment</h4>
+                        <p>Complete an age-appropriate assessment to evaluate academic readiness.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-icon"><i class="fas fa-comments"></i></div>
+                        <h4>Family Interview</h4>
+                        <p>Students and parents participate in an interview to discuss educational goals.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">5</div>
+                        <div class="step-icon"><i class="fas fa-folder-open"></i></div>
+                        <h4>Documentation</h4>
+                        <p>Submit required documents including academic records and birth certificate.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">6</div>
+                        <div class="step-icon"><i class="fas fa-check-circle"></i></div>
+                        <h4>Admission Decision</h4>
+                        <p>Admissions committee reviews all application components and communicates decisions.</p>
+                    </div>
+                </div>
+                <div class="admission-contact">
+                    <p><strong>Contact our Admissions Office:</strong> bmclmkd2011@gmail.com | +234 703 354 6935</p>
+                    <a href="#" class="btn btn-primary apply-btn">Begin Your Application</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="curriculum" class="curriculum">
+        <div class="container">
+            <div class="section-title">
+                <h2>Our Curriculum</h2>
+                <p>A dual curriculum combining Nigerian and British educational systems.</p>
+            </div>
+            <div class="curriculum-tabs">
+                <button class="tab-btn active" data-tab="nigeria">Nigerian Curriculum</button>
+                <button class="tab-btn" data-tab="british">British Curriculum</button>
+                <button class="tab-btn" data-tab="combined">Combined Advantage</button>
+            </div>
+            <div class="tab-content active" id="nigeria-tab">
+                <div class="curriculum-info">
+                    <h3>Nigerian Curriculum</h3>
+                    <p>Follows NERDC guidelines and prepares students for key national examinations:</p>
+                    <ul>
+                        <li><strong>Basic Education Certificate Examination (BECE)</strong></li>
+                        <li><strong>West African Senior School Certificate Examination (WASSCE)</strong></li>
+                        <li><strong>National Examinations Council (NECO)</strong></li>
+                        <li><strong>Joint Admissions and Matriculation Board (JAMB)</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-content" id="british-tab">
+                <div class="curriculum-info">
+                    <h3>British Curriculum</h3>
+                    <p>Based on the National Curriculum of England and Wales:</p>
+                    <ul>
+                        <li><strong>International General Certificate of Secondary Education (IGCSE)</strong></li>
+                        <li><strong>General Certificate of Education Advanced Level (A-Levels)</strong></li>
+                        <li><strong>Cambridge International Examinations</strong></li>
+                        <li><strong>Key Stages 1-4</strong></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-content" id="combined-tab">
+                <div class="curriculum-info">
+                    <h3>The Combined Advantage</h3>
+                    <p>Unique educational experience with multiple pathways to success:</p>
+                    <ul>
+                        <li><strong>Dual Certification</strong> - WASSCE/NECO and IGCSE/A-Level qualifications</li>
+                        <li><strong>Global Mobility</strong> - Recognized by universities worldwide</li>
+                        <li><strong>Cultural Fluency</strong> - Local context and global perspectives</li>
+                        <li><strong>Enhanced Critical Thinking</strong> - Depth of British education with breadth of
+                            Nigerian curriculum</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="section-title">
+                <h2>Contact Us</h2>
+                <p>We welcome your inquiries and look forward to connecting with you.</p>
+            </div>
+            <div class="contact-container">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-map-marker-alt"></i></div>
+                        <div class="contact-details">
+                            <h4>Our Location</h4>
+                            <p>John Edia Str, Ankpa Qtrs Extension<br>Makurdi, Nigeria</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone-alt"></i></div>
+                        <div class="contact-details">
+                            <h4>Phone Numbers</h4>
+                            <p>+234 703 354 6935</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="contact-details">
+                            <h4>Email Address</h4>
+                            <p>bmclmkd2011@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                        <div class="contact-details">
+                            <h4>Office Hours</h4>
+                            <p>Monday - Friday: 8:00 AM - 5:00 PM<br>Saturday: 9:00 AM - 1:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="contact-form">
+                    <h3>Send Us a Message</h3>
+                    <form id="contactForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contactName">Full Name *</label>
+                                <input type="text" id="contactName" name="contactName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactEmail">Email Address *</label>
+                                <input type="email" id="contactEmail" name="contactEmail" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contactPhone">Phone Number *</label>
+                                <input type="tel" id="contactPhone" name="contactPhone" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="contactSubject">Subject *</label>
+                                <input type="text" id="contactSubject" name="contactSubject" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="contactMessage">Message *</label>
+                            <textarea id="contactMessage" name="contactMessage" class="form-control" rows="5"
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <h3>Beautiful Minds</h3>
+                    <p>Shaping future leaders through excellence in education since 2005.</p>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/share/1CtSuLiFFc/?mibextid=wwXIfr"><i
+                                class="fab fa-facebook"></i></a>
+                        <a href="https://www.instagram.com/beautifulmindsschoolsng"><i class="fab fa-instagram"></i></a>
+                        <!-- <a href="#"><i class="fab fa-twitter"></i></a> -->
+                        <!-- <a href="#"><i class="fab fa-linkedin"></i></a> -->
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#admission">Admission</a></li>
+                        <li><a href="#curriculum">Curriculum</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-contact">
+                    <h4>Contact Info</h4>
+                    <p><i class="fas fa-map-marker-alt"></i> John Edia Str, Ankpa Qtrs Extension , Makurdi, Nigeria</p>
+                    <p><i class="fas fa-phone-alt"></i> +234 703 354 6935</p>
+                    <p><i class="fas fa-envelope"></i> bmclmkd2011@gmail.com</p>
+                    <p><i class="fas fa-clock"></i> Mon-Fri: 8:00 AM - 5:00 PM</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 Beautiful Minds School, Benue, Nigeria. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="applicationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Application Form - Beautiful Minds Schools</h3>
+                <button class="close-modal" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="success-message" id="successMessage">
+                    <i class="fas fa-check-circle"></i> Application submitted successfully! We will contact you shortly.
+                </div>
+                <form id="applicationForm">
+                    <div class="form-section">
+                        <h4>Student Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName">Full Name *</label>
+                                <input type="text" id="fullName" name="fullName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="dob">Date of Birth *</label>
+                                <input type="date" id="dob" name="dob" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="religion">Religion *</label>
+                                <select id="religion" name="religion" class="form-control" required>
+                                    <option value="">Select Religion</option>
+                                    <option value="Christianity">Christianity</option>
+                                    <option value="Islam">Islam</option>
+                                    <option value="Traditional">Traditional</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender *</label>
+                                <select id="gender" name="gender" class="form-control" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="classInterest">Class of Interest *</label>
+                                <select id="classInterest" name="classInterest" class="form-control" required>
+                                    <option value="">Select Class</option>
+                                    <option value="Creche">Creche (6 months - 2 years)</option>
+                                    <option value="Nursery">Nursery (3-4 years)</option>
+                                    <option value="Primary 1-3">Primary 1-3 (5-8 years)</option>
+                                    <option value="Primary 4-6">Primary 4-6 (9-11 years)</option>
+                                    <option value="JSS 1-3">Junior Secondary (12-14 years)</option>
+                                    <option value="SSS 1-3">Senior Secondary (15-17 years)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="nationality">Nationality *</label>
+                                <select id="nationality" name="nationality" class="form-control" required>
+                                    <option value="">Select Nationality</option>
+                                    <option value="Nigeria">Nigeria</option>
+                                    <option value="Ghana">Ghana</option>
+                                    <option value="United Kingdom">United Kingdom</option>
+                                    <option value="United States">United States</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="state">State *</label>
+                                <input type="text" id="state" name="state" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City *</label>
+                                <input type="text" id="city" name="city" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Residential Address *</label>
+                            <textarea id="address" name="address" class="form-control" rows="2" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentPhone">Student Phone </label>
+                            <input type="tel" id="studentPhone" name="studentPhone" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="studentEmail">Student Email Address </label>
+                            <input type="email" id="studentEmail" name="studentEmail" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h4>Parent/Guardian Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="motherName">Mother's Full Name *</label>
+                                <input type="text" id="motherName" name="motherName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fatherName">Father's Full Name *</label>
+                                <input type="text" id="fatherName" name="fatherName" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="motherPhone">Mother's Contact Phone *</label>
+                                <input type="tel" id="motherPhone" name="motherPhone" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="fatherPhone">Father's Contact Phone *</label>
+                                <input type="tel" id="fatherPhone" name="fatherPhone" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="parentEmail">Parent Email Address *</label>
+                                <input type="email" id="parentEmail" name="parentEmail" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="parentAddress">Parent Address *</label>
+                                <input type="text" id="parentAddress" name="parentAddress" class="form-control"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" id="cancelBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Submit Application</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./assets/js/main.js"></script>
+</body>
+
+</html>

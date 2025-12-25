@@ -1,0 +1,34 @@
+[25-Dec-2025 09:51:58 Africa/Brazzaville] Contact Request - Content-Type: application/json
+[25-Dec-2025 09:51:58 Africa/Brazzaville] Contact Request - Is JSON: YES
+[25-Dec-2025 09:51:58 Africa/Brazzaville] Contact Form Data: Array
+(
+    [name] => John Doe
+    [email] => john.doe@example.com
+    [phone] => 08012345678
+    [subject] => Admission Inquiry
+    [message] => Hello, I would like to inquire about admission requirements for my child for the upcoming academic year. Could you please send me more information about the application process and school fees?
+)
+
+[25-Dec-2025 09:56:05 Africa/Brazzaville] Application Request - Content-Type: application/json
+[25-Dec-2025 09:56:05 Africa/Brazzaville] Application Request - Is JSON: YES
+[25-Dec-2025 09:56:05 Africa/Brazzaville] Application Form Data: Array
+(
+    [fullName] => Chinedu Okoro
+    [dob] => 2011-01-05
+    [religion] => Christianity
+    [gender] => Male
+    [classInterest] => Creche
+    [nationality] => Nigeria
+    [state] => Imo
+    [city] => Owerri
+    [address] => No. 15 Gboko Road, Makurdi
+    [studentPhone] => 2348123456789
+    [studentEmail] => chineduokoro@example.com
+    [motherName] => Grace Okoro
+    [fatherName] => James Okoro
+    [motherPhone] => 2348012345678
+    [fatherPhone] => 2348098765432
+    [parentEmail] => okoro.family@example.com
+    [parentAddress] => No. 15 Gboko Road, Makurdi
+)
+
