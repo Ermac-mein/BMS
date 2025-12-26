@@ -410,7 +410,6 @@ $dbData = [
     ':parent_email' => htmlspecialchars($fields['parent_email'], ENT_QUOTES, 'UTF-8'),
     ':parent_address' => htmlspecialchars($fields['parent_address'], ENT_QUOTES, 'UTF-8'),
     ':application_id' => $applicationId,
-    ':ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
 ];
 
 /* =========================
@@ -439,7 +438,7 @@ try {
     $stmt->execute($dbData);
 
     $insertId = $pdo->lastInsertId();
-    error_log("Application saved successfully. ID: $insertId, App ID: $applicationId");
+    error_log("Application saved successfully. App ID: $applicationId");
 
 } catch (Throwable $e) {
     error_log('Database insert error: ' . $e->getMessage());
@@ -601,7 +600,6 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
 ========================= */
 $responseData = [
     'application_id' => $applicationId,
-    'database_id' => $insertId,
     'full_name' => $fields['full_name'],
     'dob' => $dobFormatted ?: $fields['dob'],
     'religion' => $fields['religion'],
