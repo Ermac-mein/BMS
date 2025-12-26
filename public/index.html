@@ -1,8 +1,3 @@
-<?php
-// This header might not be necessary if you're serving as HTML
-// header('Content-Type: text/html; charset=utf-8');
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -22,7 +17,7 @@
     <header id="header">
         <div class="container header-container">
             <div class="logo">
-                <img src="assets/logo.png" alt="Beautiful Minds School Logo" class="logo-image">
+                <img src="assets/images/logo.jpg" alt="Beautiful Minds School Logo" class="logo-image">
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
@@ -38,11 +33,13 @@
         </div>
     </header>
 
+    <!-- hero section -->
     <section class="hero" id="home">
         <div class="hero-slider">
+            <!-- Slide 1 -->
             <div class="slide active">
-                <div class="slide-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80');">
+                <div class="slide-bg">
+                    <img src="assets/images/slide1.png" alt="Nurturing Tomorrow's Leaders">
                 </div>
                 <div class="container">
                     <div class="slide-content">
@@ -56,9 +53,11 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Slide 2 -->
             <div class="slide">
-                <div class="slide-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80');">
+                <div class="slide-bg">
+                    <img src="assets/images/slide2.png" alt="Excellence in Education">
                 </div>
                 <div class="container">
                     <div class="slide-content">
@@ -72,9 +71,11 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Slide 3 -->
             <div class="slide">
-                <div class="slide-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80');">
+                <div class="slide-bg">
+                    <img src="assets/images/slide3.png" alt="World-Class Learning Environment">
                 </div>
                 <div class="container">
                     <div class="slide-content">
@@ -88,10 +89,14 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Navigation Buttons -->
             <div class="slider-nav">
                 <button class="slider-nav-btn" id="prevSlide"><i class="fas fa-chevron-left"></i></button>
                 <button class="slider-nav-btn" id="nextSlide"><i class="fas fa-chevron-right"></i></button>
             </div>
+
+            <!-- Dot Indicators -->
             <div class="slider-controls">
                 <div class="slider-dot active" data-slide="0"></div>
                 <div class="slider-dot" data-slide="1"></div>
@@ -100,6 +105,7 @@
         </div>
     </section>
 
+    <!-- about section -->
     <section id="about" class="about">
         <div class="container">
             <div class="section-title">
@@ -107,41 +113,58 @@
                 <p>Located in the heart of Benue, Nigeria, we are committed to providing world-class education.</p>
             </div>
             <div class="about-content">
-                <div class="about-img">
-                    <img src="https://images.unsplash.com/photo-1562774053-701939374585?ixlib=rb-4.0.3&auto=format&fit=crop&w=3840&q=80"
-                        alt="School Campus">
+                <div class="about-images">
+                    <div class="about-image-grid">
+                        <div class="image-grid-row">
+                            <div class="about-img">
+                                <img src="assets/images/classroom.png" alt="School Campus">
+                            </div>
+                            <div class="about-img">
+                                <img src="assets/images/slide3.png" alt="School Library">
+                            </div>
+                        </div>
+                        <div class="image-grid-row">
+                            <div class="about-img">
+                                <img src="assets/images/slide1.png" alt="School Playground">
+                            </div>
+                            <div class="about-img">
+                                <img src="assets/images/slide2.png" alt="School Laboratory">
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="about-text">
                     <h3>Shaping Future Leaders Since 2005</h3>
                     <p>Beautiful Minds School was founded with a vision to create an educational institution that would
-                        serve as a beacon of excellence in Nigeria.</p>
+                        serve as a beacon of excellence in Nigeria. Our commitment to academic excellence, character
+                        development, and holistic education has made us a leading institution in the region.</p>
                     <div class="about-features">
                         <div class="feature">
                             <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
                             <div>
                                 <h4>Qualified Teachers</h4>
-                                <p>Highly trained and experienced educators.</p>
+                                <p>Highly trained and experienced educators with advanced degrees.</p>
                             </div>
                         </div>
                         <div class="feature">
                             <div class="feature-icon"><i class="fas fa-flask"></i></div>
                             <div>
-                                <h4>Modern Labs</h4>
-                                <p>State-of-the-art science and computer laboratories.</p>
+                                <h4>Modern Facilities</h4>
+                                <p>State-of-the-art science and computer laboratories with latest equipment.</p>
                             </div>
                         </div>
                         <div class="feature">
                             <div class="feature-icon"><i class="fas fa-medal"></i></div>
                             <div>
                                 <h4>Proven Excellence</h4>
-                                <p>Consistent outstanding results in national examinations.</p>
+                                <p>Consistent outstanding results in national and international examinations.</p>
                             </div>
                         </div>
                         <div class="feature">
                             <div class="feature-icon"><i class="fas fa-heart"></i></div>
                             <div>
                                 <h4>Holistic Development</h4>
-                                <p>Focus on academic, physical, and emotional growth.</p>
+                                <p>Focus on academic, physical, emotional, and social growth of every child.</p>
                             </div>
                         </div>
                     </div>
@@ -150,6 +173,7 @@
         </div>
     </section>
 
+    <!-- admission section -->
     <section id="admission" class="admission">
         <div class="container">
             <div class="section-title">
@@ -340,8 +364,6 @@
                         <a href="https://www.facebook.com/share/1CtSuLiFFc/?mibextid=wwXIfr"><i
                                 class="fab fa-facebook"></i></a>
                         <a href="https://www.instagram.com/beautifulmindsschoolsng"><i class="fab fa-instagram"></i></a>
-                        <!-- <a href="#"><i class="fab fa-twitter"></i></a> -->
-                        <!-- <a href="#"><i class="fab fa-linkedin"></i></a> -->
                     </div>
                 </div>
                 <div class="footer-links">
@@ -359,11 +381,11 @@
                     <p><i class="fas fa-map-marker-alt"></i> John Edia Str, Ankpa Qtrs Extension , Makurdi, Nigeria</p>
                     <p><i class="fas fa-phone-alt"></i> +234 703 354 6935</p>
                     <p><i class="fas fa-envelope"></i> bmclmkd2011@gmail.com</p>
-                    <p><i class="fas fa-clock"></i> Mon-Fri: 8:00 AM - 5:00 PM</p>
+                    <p><i class="fas fa-clock"></i> Mon-Fri: 8:00 AM - 5:00 PM <br>Saturday: 9:00 AM - 1:00 PM</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2023 Beautiful Minds School, Benue, Nigeria. All Rights Reserved.</p>
+                <p>&copy; 2011 Beautiful Minds Schools. All Rights Reserved.</p><p>Designed by Conano</p>
             </div>
         </div>
     </footer>

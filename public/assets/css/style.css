@@ -1,20 +1,19 @@
 :root {
-    --primary: #1a56db;
-    --primary-dark: #1e429f;
-    --secondary: #10b981;
-    --accent: #f59e0b;
-    --light: #f8fafc;
-    --dark: #1f2937;
-    --gray: #6b7280;
-    --light-gray: #e5e7eb;
+    --primary: #4A6FA5;
+    --primary-dark: #38588C;
+    --secondary: #6B9080;
+    --accent: #A5B381;
+    --light: #F5F5F5;
+    --dark: #333333;
+    --gray: #666666;
+    --light-gray: #E0E0E0;
     --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
     --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --radius: 12px;
     --radius-lg: 16px;
-    /* page background and border weight controls */
-    --page-bg: #F8F0F3;
+    --page-bg: whitesmoke;
     --border-weight: 0.9px;
 }
 
@@ -32,7 +31,6 @@ html {
 body {
     font-family: 'Poppins', sans-serif;
     line-height: 1.6;
-    /* use a darker color for improved contrast on the new light background */
     color: var(--dark);
     overflow-x: hidden;
     background: var(--page-bg);
@@ -122,12 +120,12 @@ section {
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, var(--secondary), #0da271);
+    background: linear-gradient(135deg, var(--secondary), #5A7F70);
     color: white;
 }
 
 .btn-secondary:hover {
-    background: linear-gradient(135deg, #0da271, var(--secondary));
+    background: linear-gradient(135deg, #5A7F70, var(--secondary));
 }
 
 .btn-outline {
@@ -171,13 +169,20 @@ header {
 }
 
 .logo-image {
+    width: 50px;
     height: 50px;
-    width: auto;
+    border-radius: 50%;
+    overflow: hidden;
+    display: block;
+    object-fit: cover;
     transition: var(--transition);
+    border: 2px solid rgba(0, 0, 0, 0.04);
+    background: #ffffff;
 }
 
 .logo-image:hover {
     transform: scale(1.05);
+    box-shadow: var(--shadow);
 }
 
 .nav-links {
@@ -248,7 +253,7 @@ header {
     display: none;
     background: none;
     border: none;
-    color: white;
+    color: var(--dark);
     font-size: 1.5rem;
     cursor: pointer;
     padding: 8px;
@@ -262,7 +267,7 @@ header {
 }
 
 .mobile-menu-btn:hover {
-    background: rgba(26, 86, 219, 0.1);
+    background: rgba(74, 111, 165, 0.1);
     color: var(--primary);
 }
 
@@ -304,15 +309,19 @@ header {
     left: 0;
     width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
     z-index: -1;
+}
+
+.slide-bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
     transform: scale(1.1);
     transition: transform 10s ease;
 }
 
-.slide.active .slide-bg {
+.slide.active .slide-bg img {
     transform: scale(1);
 }
 
@@ -327,16 +336,10 @@ header {
 }
 
 .slide-content h1 {
-    /* Force solid white heading for maximum readability on slide backgrounds */
     color: #ffffff;
     font-size: 3.2rem;
     margin-bottom: 20px;
     line-height: 1.1;
-    background: none;
-    background-clip: unset;
-    -webkit-background-clip: unset;
-    -webkit-text-fill-color: initial;
-    /* subtle shadow to keep text readable against various slide images */
     text-shadow: 0 3px 14px rgba(0, 0, 0, 0.55);
 }
 
@@ -414,26 +417,40 @@ header {
 /* About Section */
 .about-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 60px;
-    align-items: center;
+    align-items: start;
+}
+
+.about-images {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.about-image-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
 }
 
 .about-img {
     border-radius: var(--radius);
     overflow: hidden;
     box-shadow: var(--shadow-lg);
-    transform: perspective(1000px) rotateY(-5deg);
     transition: var(--transition);
+    aspect-ratio: 1/1;
 }
 
 .about-img:hover {
-    transform: perspective(1000px) rotateY(0);
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-xl);
 }
 
 .about-img img {
     width: 100%;
-    height: auto;
+    height: 100%;
+    object-fit: cover;
     display: block;
     transition: var(--transition);
 }
@@ -469,7 +486,7 @@ header {
 
 .about-features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 25px;
     margin-top: 40px;
 }
@@ -614,7 +631,7 @@ header {
     justify-content: center;
     font-weight: bold;
     font-size: 1.2rem;
-    box-shadow: 0 4px 15px rgba(26, 86, 219, 0.3);
+    box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
 }
 
 .step-icon {
@@ -685,7 +702,7 @@ header {
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: white;
     border-color: var(--primary);
-    box-shadow: 0 4px 15px rgba(26, 86, 219, 0.3);
+    box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
 }
 
 .tab-btn:not(.active):hover {
@@ -744,11 +761,11 @@ header {
     border-bottom: var(--border-weight) solid var(--light-gray);
     position: relative;
     transition: var(--transition);
-    color: white;
+    color: var(--dark);
 }
 
 .curriculum-info li:hover {
-    background: rgba(26, 86, 219, 0.05);
+    background: rgba(74, 111, 165, 0.05);
     padding-left: 45px;
 }
 
@@ -896,12 +913,11 @@ header {
     transition: var(--transition);
     background: #ffffff;
     color: #333;
-    border: 1px solid #d1d5db;
 }
 
 .form-control:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
     outline: none;
 }
 
@@ -912,7 +928,7 @@ textarea.form-control {
 
 /* Footer */
 footer {
-    background: #070606;
+    background: #222;
     color: white;
     padding: 30px 0 15px;
     position: relative;
@@ -1048,8 +1064,7 @@ footer::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: transparent;
-    backdrop-filter: blur(8px);
+    background: rgba(0, 0, 0, 0.7);
     z-index: 2000;
     overflow-y: auto;
     animation: fadeIn 0.3s ease;
@@ -1245,7 +1260,16 @@ footer::before {
     }
     
     .about-content {
+        grid-template-columns: 1fr;
         gap: 40px;
+    }
+    
+    .about-images {
+        order: 2;
+    }
+    
+    .about-text {
+        order: 1;
     }
     
     .admission-process {
@@ -1275,7 +1299,6 @@ footer::before {
     
     .mobile-menu-btn {
         display: flex;
-        color: white;
     }
     
     .btn-apply {
@@ -1333,7 +1356,7 @@ footer::before {
     .nav-links a:hover,
     .nav-links a.active {
         color: var(--primary);
-        background: rgba(26, 86, 219, 0.05);
+        background: rgba(74, 111, 165, 0.05);
     }
     
     /* Show apply button in mobile menu */
@@ -1348,7 +1371,7 @@ footer::before {
         max-width: 300px;
         z-index: 1000;
         animation: slideUp 0.3s ease 0.2s both;
-        box-shadow: 0 10px 25px rgba(26, 86, 219, 0.3);
+        box-shadow: 0 10px 25px rgba(74, 111, 165, 0.3);
     }
     
     .slide-content {
@@ -1494,7 +1517,8 @@ footer::before {
         padding: 10px 15px;
     }
     
-    .logo-image {
+   .logo-image {
+        width: 40px;
         height: 40px;
     }
     
@@ -1521,6 +1545,10 @@ footer::before {
     .feature-icon {
         margin: 0 auto 15px;
     }
+    
+    .about-image-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Utility Classes */
@@ -1538,8 +1566,8 @@ footer::before {
 
 /* Validation States */
 .is-valid {
-    border-color: #10b981 !important;
-    background-color: rgba(16, 185, 129, 0.05);
+    border-color: #6B9080 !important;
+    background-color: rgba(107, 144, 128, 0.05);
 }
 
 .is-invalid {
@@ -1604,83 +1632,5 @@ footer::before {
         background: none;
         color: black;
         backdrop-filter: none;
-    }
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    :root {
-        --primary: #0044cc;
-        --secondary: #008855;
-        --accent: #aa5500;
-    }
-    
-    .btn {
-        border: 2px solid currentColor;
-    }
-    
-    .form-control {
-        border: 2px solid #000;
-    }
-}
-
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --light: #1f2937;
-        --dark: #f8fafc;
-        --gray: #d1d5db;
-        --light-gray: #374151;
-    }
-    
-    body {
-        background: #111827;
-        color: #e5e7eb;
-    }
-    
-    h1, h2, h3, h4, h5 {
-        color: #f3f4f6;
-    }
-    
-    header {
-        background: rgba(31, 41, 55, 0.98);
-    }
-    
-    .nav-links a {
-        color: #e5e7eb;
-    }
-    
-    .feature,
-    .step,
-    .curriculum-info,
-    .contact-form,
-    .contact-item,
-    .admission-process {
-        background: #1f2937;
-        border-color: #374151;
-    }
-    
-    .form-control {
-        background: #111827;
-        border-color: #4b5563;
-        color: #e5e7eb;
-    }
-    
-    .feature h4,
-    .step h4,
-    .contact-details h4,
-    .form-group label {
-        color: #f3f4f6;
-    }
-    
-    @media (max-width: 768px) {
-        .nav-links {
-            background: #1f2937;
-        }
-        
-        .nav-links a {
-            color: #e5e7eb;
-            border-color: #374151;
-        }
     }
 }

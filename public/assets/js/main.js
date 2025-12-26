@@ -222,6 +222,11 @@
                 document.body.appendChild(container);
             }
 
+            // Special handling for welcome toast
+            if (title === 'Welcome') {
+                type = 'welcome';
+            }
+
             const colors = {
                 success: { 
                     bg: '#d1fae5', 
@@ -246,6 +251,12 @@
                     border: '#0ea5e9',
                     icon: 'ℹ',
                     iconColor: '#0284c7'
+                },
+                welcome: { 
+                    bg: '#ffffff', 
+                    border: '#e5e7eb',
+                    icon: '🏫',
+                    iconColor: '#4b5563'
                 }
             };
 
@@ -260,7 +271,7 @@
                 color: #1f2937;
                 padding: 16px 20px;
                 border-radius: 8px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+                box-shadow: 0 10px 25px rgba(0,0,0,0.15);
                 opacity: 0;
                 transform: translateX(100px);
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -293,7 +304,7 @@
                 font-weight: 600;
                 font-size: 15px;
                 margin-bottom: 4px;
-                color: ${config.iconColor};
+                color: ${type === 'welcome' ? '#4b5563' : config.iconColor};
             `;
             titleEl.textContent = title;
 
@@ -301,7 +312,7 @@
             messageEl.style.cssText = `
                 font-size: 14px;
                 line-height: 1.4;
-                color: #fff;
+                color: ${type === 'welcome' ? '#6b7280' : '#374151'};
             `;
             messageEl.textContent = message;
 
@@ -310,7 +321,7 @@
             closeBtn.style.cssText = `
                 background: none;
                 border: none;
-                color: #fff;
+                color: ${type === 'welcome' ? '#6b7280' : '#374151'};
                 font-size: 20px;
                 line-height: 1;
                 cursor: pointer;
@@ -781,7 +792,7 @@
                 });
             }, observerOptions);
             
-            utils.$$('.feature, .step, .contact-item, .curriculum-info, .testimonial').forEach(el => {
+            utils.$$('.feature, .step, .contact-item, .curriculum-info, .about-img').forEach(el => {
                 if (el) {
                     el.style.opacity = '0';
                     el.style.transform = 'translateY(20px)';
@@ -1208,8 +1219,8 @@
             }
             
             .is-valid {
-                border-color: #10b981 !important;
-                background-color: rgba(16, 185, 129, 0.05) !important;
+                border-color: #6B9080 !important;
+                background-color: rgba(107, 144, 128, 0.05) !important;
             }
             
             .is-invalid {
@@ -1241,7 +1252,7 @@
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0, 0, 0, 0.7);
                 z-index: 1000;
                 justify-content: center;
                 align-items: center;
@@ -1284,7 +1295,7 @@
                 background: none;
                 border: none;
                 font-size: 24px;
-                color: #fff;
+                color: #333;
                 cursor: pointer;
                 padding: 10px;
             }
@@ -1368,7 +1379,7 @@
             }
             
             .tab-btn.active {
-                background: #10b981;
+                background: #4A6FA5;
                 color: white;
             }
             
@@ -1388,6 +1399,13 @@
             /* Toast notification animations */
             .bm-toast {
                 will-change: transform, opacity;
+            }
+            
+            /* Custom styles for welcome toast */
+            .bm-toast-welcome {
+                background: #ffffff !important;
+                border: 1px solid #e5e7eb !important;
+                border-left: 4px solid #4b5563 !important;
             }
         `;
         document.head.appendChild(style);
@@ -1461,12 +1479,10 @@
             setTimeout(() => {
                 document.body.style.opacity = '1';
                 
-                if (!sessionStorage.getItem('welcomeShown')) {
-                    setTimeout(() => {
-                        Toast.show('info', 'Welcome', 'Welcome to Beautiful Minds Schools!');
-                        sessionStorage.setItem('welcomeShown', 'true');
-                    }, 1000);
-                }
+                // Show welcome toast
+                setTimeout(() => {
+                    Toast.show('info', 'Welcome', 'Welcome to Beautiful Minds Schools!');
+                }, 1000);
             }, 100);
             
         } catch (error) {

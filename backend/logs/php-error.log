@@ -1,56 +1,45 @@
-[25-Dec-2025 09:51:58 Africa/Lagos] Extracted Fields: Array
+[26-Dec-2025 13:19:14 Africa/Lagos] Extracted Fields: Array
 (
-    [name] => John Doe
-    [email] => john.doe@example.com
-    [phone] => 08012345678
-    [subject] => Admission Inquiry
-    [message] => Hello, I would like to inquire about admission requirements for my child for the upcoming academic year. Could you please send me more information about the application process and school fees?
-)
-
-[25-Dec-2025 09:51:58 Africa/Lagos] Contact saved with ID: 1
-[25-Dec-2025 09:52:03 Africa/Lagos] Contact email sent successfully
-[25-Dec-2025 09:56:05 Africa/Lagos] Extracted Fields: Array
-(
-    [full_name] => Chinedu Okoro
-    [dob] => 2011-01-05
+    [full_name] => David Samuel
+    [dob] => 2017-01-03
     [religion] => Christianity
-    [class_interest] => Creche
+    [class_interest] => Primary 4-6
     [gender] => Male
-    [address] => No. 15 Gboko Road, Makurdi
+    [address] => opposite total filling station, ungwan boro sabo
     [nationality] => Nigeria
-    [state] => Imo
-    [city] => Owerri
-    [student_phone] => 2348123456789
-    [student_email] => chineduokoro@example.com
-    [mother_name] => Grace Okoro
-    [father_name] => James Okoro
-    [mother_phone] => 2348012345678
-    [father_phone] => 2348098765432
-    [parent_email] => okoro.family@example.com
-    [parent_address] => No. 15 Gboko Road, Makurdi
+    [state] => Kaduna
+    [city] => Sabo
+    [student_phone] => 2349087654321
+    [student_email] => 
+    [mother_name] => Ruth Samuel
+    [father_name] => Samuel Samuel
+    [mother_phone] => 2349087654321
+    [father_phone] => 2349087654321
+    [parent_email] => samueldavid@example.com
+    [parent_address] => opposite total filling station, ungwan boro sabo
 )
 
-[25-Dec-2025 09:56:05 Africa/Lagos] Application DB Data: Array
+[26-Dec-2025 13:19:14 Africa/Lagos] Application DB Data: Array
 (
-    [:full_name] => Chinedu Okoro
-    [:dob] => 2011-01-05
+    [:full_name] => David Samuel
+    [:dob] => 2017-01-03
     [:religion] => Christianity
-    [:class_interest] => Creche
+    [:class_interest] => Primary 4-6
     [:gender] => Male
-    [:address] => No. 15 Gboko Road, Makurdi
+    [:address] => opposite total filling station, ungwan boro sabo
     [:nationality] => Nigeria
-    [:state] => Imo
-    [:city] => Owerri
-    [:student_phone] => 2348123456789
-    [:student_email] => chineduokoro@example.com
-    [:mother_name] => Grace Okoro
-    [:father_name] => James Okoro
-    [:mother_phone] => 2348012345678
-    [:father_phone] => 2348098765432
-    [:parent_email] => okoro.family@example.com
-    [:parent_address] => No. 15 Gboko Road, Makurdi
-    [:application_id] => APP2025122552D6A8
+    [:state] => Kaduna
+    [:city] => Sabo
+    [:student_phone] => 2349087654321
+    [:student_email] => 
+    [:mother_name] => Ruth Samuel
+    [:father_name] => Samuel Samuel
+    [:mother_phone] => 2349087654321
+    [:father_phone] => 2349087654321
+    [:parent_email] => samueldavid@example.com
+    [:parent_address] => opposite total filling station, ungwan boro sabo
+    [:application_id] => APP2025122622D8EE
     [:ip_address] => 127.0.0.1
 )
 
-[25-Dec-2025 09:56:05 Africa/Lagos] Application saved successfully. ID: 1, App ID: APP2025122552D6A8
+[26-Dec-2025 13:19:14 Africa/Lagos] Application saved successfully. ID: 2, App ID: APP2025122622D8EE
