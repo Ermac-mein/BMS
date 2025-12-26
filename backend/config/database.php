@@ -57,9 +57,9 @@ if ($databaseUrl) {
    SCHOOL CONFIG
 ======================== */
 define('SCHOOL_NAME', getenv('SCHOOL_NAME') ?: 'Beautiful Minds Schools');
-define('SCHOOL_EMAIL', getenv('SCHOOL_EMAIL') ?: 'testalive9@gmail.com');
-define('SCHOOL_PHONE', getenv('SCHOOL_PHONE') ?: '+2347019068937');
-define('SCHOOL_ADDRESS', getenv('SCHOOL_ADDRESS') ?: 'KM 12, Gboko Road, Makurdi, Benue State');
+define('SCHOOL_EMAIL', getenv('SCHOOL_EMAIL') ?: 'beautifulmindsschools@gmail.com');
+define('SCHOOL_PHONE', getenv('SCHOOL_PHONE') ?: '+2347033546935');
+define('SCHOOL_ADDRESS', getenv('SCHOOL_ADDRESS') ?: 'John Edia Str, Ankpa Qtrs Extension , Makurdi, Nigeria');
 
 /* ========================
    SMTP CONFIG
@@ -68,7 +68,7 @@ define('SMTP_HOST', getenv('SMTP_HOST') ?: 'smtp.gmail.com');
 define('SMTP_PORT', (int) (getenv('SMTP_PORT') ?: 587));
 define('SMTP_SECURE', getenv('SMTP_SECURE') ?: 'tls');
 define('SMTP_USER', getenv('SMTP_USER') ?: SCHOOL_EMAIL);
-define('SMTP_PASS', getenv('SMTP_PASS') ?: 'ipfg opwu kxvi szvm');
+define('SMTP_PASS', getenv('SMTP_PASS') ?: 'uosk qqgm ctsm kjcc');
 define('SMTP_FROM', getenv('SMTP_FROM') ?: SCHOOL_EMAIL);
 define('SMTP_FROM_NAME', getenv('SMTP_FROM_NAME') ?: SCHOOL_NAME);
 

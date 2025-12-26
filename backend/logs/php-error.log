@@ -1,45 +1,193 @@
-[26-Dec-2025 13:19:14 Africa/Lagos] Extracted Fields: Array
+[26-Dec-2025 23:37:48 Africa/Lagos] Extracted Fields: Array
 (
-    [full_name] => David Samuel
-    [dob] => 2017-01-03
-    [religion] => Christianity
-    [class_interest] => Primary 4-6
-    [gender] => Male
-    [address] => opposite total filling station, ungwan boro sabo
-    [nationality] => Nigeria
-    [state] => Kaduna
-    [city] => Sabo
-    [student_phone] => 2349087654321
-    [student_email] => 
-    [mother_name] => Ruth Samuel
-    [father_name] => Samuel Samuel
-    [mother_phone] => 2349087654321
-    [father_phone] => 2349087654321
-    [parent_email] => samueldavid@example.com
-    [parent_address] => opposite total filling station, ungwan boro sabo
+    [name] => John Doe
+    [email] => doejohn@gmail.com
+    [phone] => 09087654321
+    [subject] => Admission Inquiry
+    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees.
 )
 
-[26-Dec-2025 13:19:14 Africa/Lagos] Application DB Data: Array
+[26-Dec-2025 23:37:48 Africa/Lagos] Contact saved with ID: 3
+[26-Dec-2025 23:37:53 Africa/Lagos] Contact email sent successfully
+[26-Dec-2025 23:44:33 Africa/Lagos] Extracted Fields: Array
 (
-    [:full_name] => David Samuel
-    [:dob] => 2017-01-03
+    [full_name] => Samuel David
+    [dob] => 2019-01-10
+    [religion] => Christianity
+    [class_interest] => Primary 1-3
+    [gender] => Male
+    [address] => No 10 crescent street, opposite living faith
+    [nationality] => Nigeria
+    [state] => Abuja
+    [city] => Lokogoma
+    [student_phone] => 
+    [student_email] => 
+    [mother_name] => Faith David
+    [father_name] => David David
+    [mother_phone] => 2348098765432
+    [father_phone] => 2347098765432
+    [parent_email] => davidfaith@example.com
+    [parent_address] => No 10 crescent street, opposite living faith
+)
+
+[26-Dec-2025 23:44:33 Africa/Lagos] Application DB Data: Array
+(
+    [:full_name] => Samuel David
+    [:dob] => 2019-01-10
     [:religion] => Christianity
-    [:class_interest] => Primary 4-6
+    [:class_interest] => Primary 1-3
     [:gender] => Male
-    [:address] => opposite total filling station, ungwan boro sabo
+    [:address] => No 10 crescent street, opposite living faith
     [:nationality] => Nigeria
-    [:state] => Kaduna
-    [:city] => Sabo
-    [:student_phone] => 2349087654321
+    [:state] => Abuja
+    [:city] => Lokogoma
+    [:student_phone] => 
     [:student_email] => 
-    [:mother_name] => Ruth Samuel
-    [:father_name] => Samuel Samuel
-    [:mother_phone] => 2349087654321
-    [:father_phone] => 2349087654321
-    [:parent_email] => samueldavid@example.com
-    [:parent_address] => opposite total filling station, ungwan boro sabo
-    [:application_id] => APP2025122622D8EE
+    [:mother_name] => Faith David
+    [:father_name] => David David
+    [:mother_phone] => 2348098765432
+    [:father_phone] => 2347098765432
+    [:parent_email] => davidfaith@example.com
+    [:parent_address] => No 10 crescent street, opposite living faith
+    [:application_id] => APP202512261D3C04
     [:ip_address] => 127.0.0.1
 )
 
-[26-Dec-2025 13:19:14 Africa/Lagos] Application saved successfully. ID: 2, App ID: APP2025122622D8EE
+[26-Dec-2025 23:44:33 Africa/Lagos] Application saved successfully. ID: 3, App ID: APP202512261D3C04
+[26-Dec-2025 23:49:44 Africa/Lagos] Extracted Fields: Array
+(
+    [full_name] => samuel samson jr
+    [dob] => 2020-09-14
+    [religion] => Christianity
+    [class_interest] => Primary 1-3
+    [gender] => Male
+    [address] => opposite oando filling station
+    [nationality] => Nigeria
+    [state] => Kaduna
+    [city] => Mahuta
+    [student_phone] => 2348012345678
+    [student_email] => samuelson@example.com
+    [mother_name] => Rebecca Samson
+    [father_name] => Samuel Samson
+    [mother_phone] => 2349087654321
+    [father_phone] => 2348098765432
+    [parent_email] => samuelson@example.com
+    [parent_address] => opposite oando filling station
+)
+
+[26-Dec-2025 23:49:44 Africa/Lagos] Application DB Data: Array
+(
+    [:full_name] => samuel samson jr
+    [:dob] => 2020-09-14
+    [:religion] => Christianity
+    [:class_interest] => Primary 1-3
+    [:gender] => Male
+    [:address] => opposite oando filling station
+    [:nationality] => Nigeria
+    [:state] => Kaduna
+    [:city] => Mahuta
+    [:student_phone] => 2348012345678
+    [:student_email] => samuelson@example.com
+    [:mother_name] => Rebecca Samson
+    [:father_name] => Samuel Samson
+    [:mother_phone] => 2349087654321
+    [:father_phone] => 2348098765432
+    [:parent_email] => samuelson@example.com
+    [:parent_address] => opposite oando filling station
+    [:application_id] => APP202512268ACBCF
+    [:ip_address] => 127.0.0.1
+)
+
+[26-Dec-2025 23:49:44 Africa/Lagos] Application saved successfully. ID: 4, App ID: APP202512268ACBCF
+[27-Dec-2025 00:07:25 Africa/Lagos] Extracted Fields: Array
+(
+    [full_name] => samuel samson jr
+    [dob] => 2020-05-04
+    [religion] => Christianity
+    [class_interest] => Primary 1-3
+    [gender] => Male
+    [address] => opposite oando filling station
+    [nationality] => Nigeria
+    [state] => Kaduna
+    [city] => Mahuta
+    [student_phone] => 2348012345678
+    [student_email] => samuelson@example.com
+    [mother_name] => Rebecca Samson
+    [father_name] => Samuel Samson
+    [mother_phone] => 2349098765432
+    [father_phone] => 2348098765432
+    [parent_email] => samuelson@example.com
+    [parent_address] => opposite oando filling station
+)
+
+[27-Dec-2025 00:07:25 Africa/Lagos] Application DB Data: Array
+(
+    [:full_name] => samuel samson jr
+    [:dob] => 2020-05-04
+    [:religion] => Christianity
+    [:class_interest] => Primary 1-3
+    [:gender] => Male
+    [:address] => opposite oando filling station
+    [:nationality] => Nigeria
+    [:state] => Kaduna
+    [:city] => Mahuta
+    [:student_phone] => 2348012345678
+    [:student_email] => samuelson@example.com
+    [:mother_name] => Rebecca Samson
+    [:father_name] => Samuel Samson
+    [:mother_phone] => 2349098765432
+    [:father_phone] => 2348098765432
+    [:parent_email] => samuelson@example.com
+    [:parent_address] => opposite oando filling station
+    [:application_id] => APP20251227D4B58F
+    [:ip_address] => 127.0.0.1
+)
+
+[27-Dec-2025 00:07:25 Africa/Lagos] Application saved successfully. ID: 5, App ID: APP20251227D4B58F
+[27-Dec-2025 00:07:29 Africa/Lagos] Application email sent successfully for Application ID: APP20251227D4B58F
+[27-Dec-2025 00:17:41 Africa/Lagos] Extracted Fields: Array
+(
+    [full_name] => samuel samson jr
+    [dob] => 2020-05-18
+    [religion] => Christianity
+    [class_interest] => Primary 1-3
+    [gender] => Male
+    [address] => opposite oando filling station
+    [nationality] => Nigeria
+    [state] => Kaduna
+    [city] => Mahuta
+    [student_phone] => 2348012345678
+    [student_email] => samuelson@example.com
+    [mother_name] => Rebecca Samson
+    [father_name] => Samuel Samson
+    [mother_phone] => 2349098765432
+    [father_phone] => 2348098765432
+    [parent_email] => samuelson@example.com
+    [parent_address] => opposite oando filling station
+)
+
+[27-Dec-2025 00:17:41 Africa/Lagos] Application DB Data: Array
+(
+    [:full_name] => samuel samson jr
+    [:dob] => 2020-05-18
+    [:religion] => Christianity
+    [:class_interest] => Primary 1-3
+    [:gender] => Male
+    [:address] => opposite oando filling station
+    [:nationality] => Nigeria
+    [:state] => Kaduna
+    [:city] => Mahuta
+    [:student_phone] => 2348012345678
+    [:student_email] => samuelson@example.com
+    [:mother_name] => Rebecca Samson
+    [:father_name] => Samuel Samson
+    [:mother_phone] => 2349098765432
+    [:father_phone] => 2348098765432
+    [:parent_email] => samuelson@example.com
+    [:parent_address] => opposite oando filling station
+    [:application_id] => APP202512275B3C2F
+    [:ip_address] => 127.0.0.1
+)
+
+[27-Dec-2025 00:17:41 Africa/Lagos] Application saved successfully. ID: 6, App ID: APP202512275B3C2F
+[27-Dec-2025 00:17:45 Africa/Lagos] Application email sent successfully for Application ID: APP202512275B3C2F

@@ -7,6 +7,9 @@ ini_set('log_errors', '1');
 ini_set('error_log', __DIR__ . '/php-error.log');
 error_reporting(E_ALL);
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 require __DIR__ . '/../vendor/autoload.php';
 
 /* =========================
@@ -354,7 +357,7 @@ function normalizePhoneSimple(string $phone): string
 // Normalize phone numbers
 $motherPhone = normalizePhoneSimple($fields['mother_phone']);
 $fatherPhone = normalizePhoneSimple($fields['father_phone']);
-$studentPhone = normalizePhoneSimple($fields['student_phone']); // NEW
+$studentPhone = normalizePhoneSimple($fields['student_phone']);
 
 // Check phone lengths if provided
 if (!empty($motherPhone) && (strlen($motherPhone) < 10 || strlen($motherPhone) > 15)) {
@@ -386,32 +389,34 @@ if (!empty($errors)) {
 $applicationId = 'APP' . date('Ymd') . strtoupper(substr(uniqid(), -6));
 
 /* =========================
+   Prepare data for database
+========================= */
+$dbData = [
+    ':full_name' => htmlspecialchars($fields['full_name'], ENT_QUOTES, 'UTF-8'),
+    ':dob' => $dobFormatted,
+    ':religion' => htmlspecialchars($fields['religion'], ENT_QUOTES, 'UTF-8'),
+    ':class_interest' => htmlspecialchars($fields['class_interest'], ENT_QUOTES, 'UTF-8'),
+    ':gender' => htmlspecialchars($fields['gender'], ENT_QUOTES, 'UTF-8'),
+    ':address' => htmlspecialchars($fields['address'], ENT_QUOTES, 'UTF-8'),
+    ':nationality' => htmlspecialchars($fields['nationality'], ENT_QUOTES, 'UTF-8'),
+    ':state' => htmlspecialchars($fields['state'], ENT_QUOTES, 'UTF-8'),
+    ':city' => htmlspecialchars($fields['city'], ENT_QUOTES, 'UTF-8'),
+    ':student_phone' => $studentPhone,
+    ':student_email' => htmlspecialchars($fields['student_email'], ENT_QUOTES, 'UTF-8'),
+    ':mother_name' => htmlspecialchars($fields['mother_name'], ENT_QUOTES, 'UTF-8'),
+    ':father_name' => htmlspecialchars($fields['father_name'], ENT_QUOTES, 'UTF-8'),
+    ':mother_phone' => $motherPhone,
+    ':father_phone' => $fatherPhone,
+    ':parent_email' => htmlspecialchars($fields['parent_email'], ENT_QUOTES, 'UTF-8'),
+    ':parent_address' => htmlspecialchars($fields['parent_address'], ENT_QUOTES, 'UTF-8'),
+    ':application_id' => $applicationId,
+    ':ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
+];
+
+/* =========================
    Save to Database
 ========================= */
 try {
-    // Prepare data for insertion
-    $dbData = [
-        ':full_name' => htmlspecialchars($fields['full_name'], ENT_QUOTES, 'UTF-8'),
-        ':dob' => $dobFormatted,
-        ':religion' => htmlspecialchars($fields['religion'], ENT_QUOTES, 'UTF-8'),
-        ':class_interest' => htmlspecialchars($fields['class_interest'], ENT_QUOTES, 'UTF-8'),
-        ':gender' => htmlspecialchars($fields['gender'], ENT_QUOTES, 'UTF-8'),
-        ':address' => htmlspecialchars($fields['address'], ENT_QUOTES, 'UTF-8'),
-        ':nationality' => htmlspecialchars($fields['nationality'], ENT_QUOTES, 'UTF-8'),
-        ':state' => htmlspecialchars($fields['state'], ENT_QUOTES, 'UTF-8'),
-        ':city' => htmlspecialchars($fields['city'], ENT_QUOTES, 'UTF-8'),
-        ':student_phone' => $studentPhone, // NEW
-        ':student_email' => htmlspecialchars($fields['student_email'], ENT_QUOTES, 'UTF-8'), // NEW
-        ':mother_name' => htmlspecialchars($fields['mother_name'], ENT_QUOTES, 'UTF-8'),
-        ':father_name' => htmlspecialchars($fields['father_name'], ENT_QUOTES, 'UTF-8'),
-        ':mother_phone' => $motherPhone,
-        ':father_phone' => $fatherPhone,
-        ':parent_email' => htmlspecialchars($fields['parent_email'], ENT_QUOTES, 'UTF-8'),
-        ':parent_address' => htmlspecialchars($fields['parent_address'], ENT_QUOTES, 'UTF-8'),
-        ':application_id' => $applicationId,
-        ':ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown'
-    ];
-
     // Log data before insertion
     error_log('Application DB Data: ' . print_r($dbData, true));
 
@@ -439,6 +444,156 @@ try {
 } catch (Throwable $e) {
     error_log('Database insert error: ' . $e->getMessage());
     jsonResponse(500, 'We could not save your application. Please try again later.');
+}
+
+/* =========================
+   Send Email Notification
+========================= */
+$emailSent = false;
+if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
+    try {
+        $mail = new PHPMailer(true);
+
+        // SMTP Configuration
+        $mail->isSMTP();
+        $mail->Host = SMTP_HOST;
+        $mail->SMTPAuth = true;
+        $mail->Username = defined('SMTP_USER') ? SMTP_USER : '';
+        $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : '';
+        $mail->SMTPSecure = defined('SMTP_SECURE') ? constant('SMTP_SECURE') : 'tls';
+        $mail->Port = defined('SMTP_PORT') ? constant('SMTP_PORT') : 587;
+
+        // Email content
+        $mail->setFrom(SMTP_FROM, 'Beautiful Minds Schools');
+        $mail->addAddress(SMTP_FROM);
+
+        // Add reply-to for parent email
+        if (filter_var($fields['parent_email'], FILTER_VALIDATE_EMAIL)) {
+            $mail->addReplyTo($fields['parent_email'], $fields['full_name'] . "'s Parent");
+        }
+
+        $mail->isHTML(true);
+        $mail->Subject = "New Application Submitted: {$applicationId} - " . htmlspecialchars($fields['full_name']);
+
+        // Build email body with comprehensive details - NO EMOJIS
+        $body = "<h3 style='color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;'>
+                New Student Application - {$applicationId}</h3>";
+
+        $body .= "<div style='background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;'>";
+        $body .= "<h4 style='color: #2c3e50; margin-top: 0;'>Application Summary</h4>";
+        $body .= "<p><strong>Submission Time:</strong> " . date('F j, Y, g:i a') . "</p>";
+        $body .= "<p><strong>Application ID:</strong> <code>{$applicationId}</code></p>";
+        $body .= "</div>";
+
+        // Student Information Section
+        $body .= "<h4 style='color: #2c3e50;'>Student Information</h4>";
+        $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Full Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['full_name']) . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Date of Birth</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . ($dobFormatted ?: htmlspecialchars($fields['dob'])) . "</td></tr>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Gender</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['gender']) . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Religion</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['religion']) . "</td></tr>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Class Interest</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['class_interest']) . "</td></tr>";
+
+        if (!empty($studentPhone)) {
+            $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Student Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $studentPhone . "</td></tr>";
+        }
+
+        if (!empty($fields['student_email'])) {
+            $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Student Email</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['student_email']) . "</td></tr>";
+        }
+        $body .= "</table>";
+
+        // Contact Information Section
+        $body .= "<h4 style='color: #2c3e50;'>Contact Information</h4>";
+        $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Address</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['address']) . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>City</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['city']) . "</td></tr>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>State</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['state']) . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Nationality</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['nationality']) . "</td></tr>";
+        $body .= "</table>";
+
+        // Parent Information Section
+        $body .= "<h4 style='color: #2c3e50;'>Parent Information</h4>";
+        $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Mother's Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['mother_name']) . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Mother's Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $motherPhone . "</td></tr>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Father's Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['father_name']) . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Father's Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $fatherPhone . "</td></tr>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Parent Email</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['parent_email']) . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Parent Address</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['parent_address']) . "</td></tr>";
+        $body .= "</table>";
+
+        // Footer with action items
+        $body .= "<div style='background: #e8f4fc; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; margin-top: 20px;'>";
+        $body .= "<p style='margin: 0;'><strong>Next Steps:</strong></p>";
+        $body .= "<ul style='margin: 10px 0 0 0; padding-left: 20px;'>";
+        $body .= "<li>Contact parent at: " . $motherPhone . " (Mother) or " . $fatherPhone . " (Father)</li>";
+        $body .= "<li>Follow up via email: " . htmlspecialchars($fields['parent_email']) . "</li>";
+        $body .= "<li>Application status can be updated in the database</li>";
+        $body .= "</ul>";
+        $body .= "</div>";
+
+        // System note
+        $body .= "<p style='color: #7f8c8d; font-size: 12px; margin-top: 20px; border-top: 1px solid #ecf0f1; padding-top: 10px;'>";
+        $body .= "This email was automatically generated by the Beautiful Minds Schools application system.";
+        $body .= "</p>";
+
+        $mail->Body = $body;
+
+        // Plain text alternative - NO EMOJIS
+        $plainBody = "NEW STUDENT APPLICATION\n";
+        $plainBody .= "=======================\n\n";
+        $plainBody .= "Application ID: {$applicationId}\n";
+        $plainBody .= "Submission Time: " . date('F j, Y, g:i a') . "\n";
+        $plainBody .= "Database ID: {$insertId}\n\n";
+
+        $plainBody .= "STUDENT INFORMATION\n";
+        $plainBody .= "-------------------\n";
+        $plainBody .= "Full Name: " . $fields['full_name'] . "\n";
+        $plainBody .= "Date of Birth: " . ($dobFormatted ?: $fields['dob']) . "\n";
+        $plainBody .= "Gender: " . $fields['gender'] . "\n";
+        $plainBody .= "Religion: " . $fields['religion'] . "\n";
+        $plainBody .= "Class Interest: " . $fields['class_interest'] . "\n";
+
+        if (!empty($studentPhone)) {
+            $plainBody .= "Student Phone: " . $studentPhone . "\n";
+        }
+
+        if (!empty($fields['student_email'])) {
+            $plainBody .= "Student Email: " . $fields['student_email'] . "\n";
+        }
+
+        $plainBody .= "\nCONTACT INFORMATION\n";
+        $plainBody .= "--------------------\n";
+        $plainBody .= "Address: " . $fields['address'] . "\n";
+        $plainBody .= "City: " . $fields['city'] . "\n";
+        $plainBody .= "State: " . $fields['state'] . "\n";
+        $plainBody .= "Nationality: " . $fields['nationality'] . "\n";
+
+        $plainBody .= "\nPARENT INFORMATION\n";
+        $plainBody .= "-------------------\n";
+        $plainBody .= "Mother's Name: " . $fields['mother_name'] . "\n";
+        $plainBody .= "Mother's Phone: " . $motherPhone . "\n";
+        $plainBody .= "Father's Name: " . $fields['father_name'] . "\n";
+        $plainBody .= "Father's Phone: " . $fatherPhone . "\n";
+        $plainBody .= "Parent Email: " . $fields['parent_email'] . "\n";
+        $plainBody .= "Parent Address: " . $fields['parent_address'] . "\n\n";
+
+        $plainBody .= "NEXT STEPS:\n";
+        $plainBody .= "* Contact parent at: " . $motherPhone . " (Mother) or " . $fatherPhone . " (Father)\n";
+        $plainBody .= "* Follow up via email: " . $fields['parent_email'] . "\n";
+        $plainBody .= "* Update application status in database\n";
+
+        $mail->AltBody = $plainBody;
+
+        $mail->send();
+        $emailSent = true;
+        error_log("Application email sent successfully for Application ID: {$applicationId}");
+
+    } catch (Exception $e) {
+        error_log('Application email sending failed: ' . $e->getMessage());
+        $emailSent = false;
+    }
 }
 
 /* =========================
@@ -487,6 +642,7 @@ if (!empty($fields['address'])) {
 ========================= */
 jsonResponse(200, 'Application submitted successfully! Our admissions team will contact you within 2-3 business days.', [
     'application_id' => $applicationId,
+    'emailSent' => $emailSent,
     'warnings' => $warnings,
     'databaseSaved' => true,
     'data' => $responseData
