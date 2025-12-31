@@ -261,43 +261,68 @@ if (!empty($fields['dob'])) {
     }
 }
 
-function normalizePhoneSimple(string $phone): string
+function normalizePhoneWithPlus(string $phone): string
 {
     if (empty($phone)) {
         return '';
     }
 
     $phone = trim($phone);
+
+    // Remove any existing + sign for processing
+    $phone = ltrim($phone, '+');
+
+    // Extract digits only
     $digits = preg_replace('/\D/', '', $phone);
 
     if (empty($digits)) {
         return '';
     }
 
+    // If it's 11 digits and starts with 0 (Nigeria), convert to 234
     if (strlen($digits) === 11 && strpos($digits, '0') === 0) {
         return '234' . substr($digits, 1);
     }
 
+    // If it's 10 digits and doesn't start with 0, assume it's already country code + number
     if (strlen($digits) >= 10 && strlen($digits) <= 15) {
         return $digits;
     }
 
-    return $phone;
+    return $digits;
 }
 
-$motherPhone = normalizePhoneSimple($fields['mother_phone']);
-$fatherPhone = normalizePhoneSimple($fields['father_phone']);
-$studentPhone = normalizePhoneSimple($fields['student_phone']);
+function formatPhoneForDisplay(string $phone): string
+{
+    if (empty($phone)) {
+        return '';
+    }
 
-if (!empty($motherPhone) && (strlen($motherPhone) < 10 || strlen($motherPhone) > 15)) {
+    $normalized = normalizePhoneWithPlus($phone);
+    if (empty($normalized)) {
+        return '';
+    }
+
+    return '+' . $normalized;
+}
+
+$motherPhoneDigits = normalizePhoneWithPlus($fields['mother_phone']);
+$fatherPhoneDigits = normalizePhoneWithPlus($fields['father_phone']);
+$studentPhoneDigits = normalizePhoneWithPlus($fields['student_phone']);
+
+$displayMotherPhone = formatPhoneForDisplay($fields['mother_phone']);
+$displayFatherPhone = formatPhoneForDisplay($fields['father_phone']);
+$displayStudentPhone = formatPhoneForDisplay($fields['student_phone']);
+
+if (!empty($motherPhoneDigits) && (strlen($motherPhoneDigits) < 10 || strlen($motherPhoneDigits) > 15)) {
     $errors['motherPhone'] = 'Mother phone number must be 10-15 digits';
 }
 
-if (!empty($fatherPhone) && (strlen($fatherPhone) < 10 || strlen($fatherPhone) > 15)) {
+if (!empty($fatherPhoneDigits) && (strlen($fatherPhoneDigits) < 10 || strlen($fatherPhoneDigits) > 15)) {
     $errors['fatherPhone'] = 'Father phone number must be 10-15 digits';
 }
 
-if (!empty($studentPhone) && (strlen($studentPhone) < 10 || strlen($studentPhone) > 15)) {
+if (!empty($studentPhoneDigits) && (strlen($studentPhoneDigits) < 10 || strlen($studentPhoneDigits) > 15)) {
     $warnings['studentPhone'] = 'Student phone number may be invalid';
 }
 
@@ -335,12 +360,12 @@ $dbData = [
     ':nationality' => htmlspecialchars($fields['nationality'], ENT_QUOTES, 'UTF-8'),
     ':state' => htmlspecialchars($fields['state'], ENT_QUOTES, 'UTF-8'),
     ':city' => htmlspecialchars($fields['city'], ENT_QUOTES, 'UTF-8'),
-    ':student_phone' => $studentPhone,
+    ':student_phone' => $studentPhoneDigits,
     ':student_email' => htmlspecialchars($fields['student_email'], ENT_QUOTES, 'UTF-8'),
     ':mother_name' => htmlspecialchars($fields['mother_name'], ENT_QUOTES, 'UTF-8'),
     ':father_name' => htmlspecialchars($fields['father_name'], ENT_QUOTES, 'UTF-8'),
-    ':mother_phone' => $motherPhone,
-    ':father_phone' => $fatherPhone,
+    ':mother_phone' => $motherPhoneDigits,
+    ':father_phone' => $fatherPhoneDigits,
     ':parent_email' => htmlspecialchars($fields['parent_email'], ENT_QUOTES, 'UTF-8'),
     ':parent_address' => htmlspecialchars($fields['parent_address'], ENT_QUOTES, 'UTF-8'),
     ':application_id' => $applicationId,
@@ -432,8 +457,8 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Religion</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['religion']) . "</td></tr>";
         $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Class Interest</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['class_interest']) . "</td></tr>";
 
-        if (!empty($studentPhone)) {
-            $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Student Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $studentPhone . "</td></tr>";
+        if (!empty($displayStudentPhone)) {
+            $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Student Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $displayStudentPhone . "</td></tr>";
         }
 
         if (!empty($fields['student_email'])) {
@@ -452,9 +477,9 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<h4 style='color: #2c3e50;'>Parent Information</h4>";
         $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
         $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Mother's Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['mother_name']) . "</td></tr>";
-        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Mother's Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $motherPhone . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Mother's Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $displayMotherPhone . "</td></tr>";
         $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Father's Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['father_name']) . "</td></tr>";
-        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Father's Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $fatherPhone . "</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Father's Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . $displayFatherPhone . "</td></tr>";
         $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Parent Email</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['parent_email']) . "</td></tr>";
         $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Parent Address</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['parent_address']) . "</td></tr>";
         $body .= "</table>";
@@ -462,7 +487,7 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<div style='background: #e8f4fc; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; margin-top: 20px;'>";
         $body .= "<p style='margin: 0;'><strong>Next Steps:</strong></p>";
         $body .= "<ul style='margin: 10px 0 0 0; padding-left: 20px;'>";
-        $body .= "<li>Contact parent at: ". $motherPhone . " (Mother) or " . $fatherPhone . " (Father)</li>";
+        $body .= "<li>Contact parent at: " . $displayMotherPhone . " (Mother) or " . $displayFatherPhone . " (Father)</li>";
         $body .= "<li>Follow up via email: " . htmlspecialchars($fields['parent_email']) . "</li>";
         $body .= "</ul>";
         $body .= "</div>";
@@ -486,8 +511,8 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $plainBody .= "Religion: " . $fields['religion'] . "\n";
         $plainBody .= "Class Interest: " . $fields['class_interest'] . "\n";
 
-        if (!empty($studentPhone)) {
-            $plainBody .= "Student Phone: " . $studentPhone . "\n";
+        if (!empty($displayStudentPhone)) {
+            $plainBody .= "Student Phone: " . $displayStudentPhone . "\n";
         }
 
         if (!empty($fields['student_email'])) {
@@ -504,14 +529,14 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $plainBody .= "\nPARENT INFORMATION\n";
         $plainBody .= "-------------------\n";
         $plainBody .= "Mother's Name: " . $fields['mother_name'] . "\n";
-        $plainBody .= "Mother's Phone: " . $motherPhone . "\n";
+        $plainBody .= "Mother's Phone: " . $displayMotherPhone . "\n";
         $plainBody .= "Father's Name: " . $fields['father_name'] . "\n";
-        $plainBody .= "Father's Phone: " . $fatherPhone . "\n";
+        $plainBody .= "Father's Phone: " . $displayFatherPhone . "\n";
         $plainBody .= "Parent Email: " . $fields['parent_email'] . "\n";
         $plainBody .= "Parent Address: " . $fields['parent_address'] . "\n\n";
 
         $plainBody .= "NEXT STEPS:\n";
-        $plainBody .= "* Contact parent at: " . $motherPhone . " (Mother) or " . $fatherPhone . " (Father)\n";
+        $plainBody .= "* Contact parent at: " . $displayMotherPhone . " (Mother) or " . $displayFatherPhone . " (Father)\n";
         $plainBody .= "* Follow up via email: " . $fields['parent_email'] . "\n";
 
         $mail->AltBody = $plainBody;
@@ -546,17 +571,17 @@ $responseData = [
     'address' => $fields['address'],
 ];
 
-if (!empty($studentPhone)) {
-    $responseData['student_phone'] = $studentPhone;
+if (!empty($displayStudentPhone)) {
+    $responseData['student_phone'] = $displayStudentPhone;
 }
 if (!empty($fields['student_email'])) {
     $responseData['student_email'] = $fields['student_email'];
 }
-if (!empty($motherPhone)) {
-    $responseData['mother_phone'] = $motherPhone;
+if (!empty($displayMotherPhone)) {
+    $responseData['mother_phone'] = $displayMotherPhone;
 }
-if (!empty($fatherPhone)) {
-    $responseData['father_phone'] = $fatherPhone;
+if (!empty($displayFatherPhone)) {
+    $responseData['father_phone'] = $displayFatherPhone;
 }
 
 /* =========================

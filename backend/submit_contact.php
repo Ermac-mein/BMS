@@ -163,31 +163,53 @@ if (empty($fields['message'])) {
     $warnings['contactMessage'] = 'Message seems very short';
 }
 
-function normalizePhoneSimple(string $phone): string
+function normalizePhoneWithPlus(string $phone): string
 {
     if (empty($phone)) {
         return '';
     }
 
     $phone = trim($phone);
+    
+    // Remove any existing + sign for processing
+    $phone = ltrim($phone, '+');
+    
+    // Extract digits only
     $digits = preg_replace('/\D/', '', $phone);
-
+    
     if (empty($digits)) {
         return '';
     }
 
+    // If it's 11 digits and starts with 0 (Nigeria), convert to 234
     if (strlen($digits) === 11 && strpos($digits, '0') === 0) {
         return '234' . substr($digits, 1);
     }
-
+    
+    // If it's 10 digits and doesn't start with 0, assume it's already country code + number
+    // For example, 233xxxxxxxx (Ghana) or 234xxxxxxxx (Nigeria)
     if (strlen($digits) >= 10 && strlen($digits) <= 15) {
         return $digits;
     }
 
-    return $phone;
+    return $digits;
 }
 
-$normalizedPhone = normalizePhoneSimple($fields['phone']);
+function formatPhoneForDisplay(string $phone): string
+{
+    if (empty($phone)) {
+        return '';
+    }
+    
+    $normalized = normalizePhoneWithPlus($phone);
+    if (empty($normalized)) {
+        return '';
+    }
+    
+    return '+' . $normalized;
+}
+
+$normalizedPhone = normalizePhoneWithPlus($fields['phone']);
 
 if (!empty($fields['phone']) && !empty($normalizedPhone) && (strlen($normalizedPhone) < 10 || strlen($normalizedPhone) > 15)) {
     $errors['contactPhone'] = 'Phone number must be 10-15 digits';
@@ -255,6 +277,8 @@ try {
    Send Email Notification (Optional)
 ========================= */
 $emailSent = false;
+$displayPhone = formatPhoneForDisplay($fields['phone']);
+
 if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
     try {
         $mail = new PHPMailer(true);
@@ -281,8 +305,8 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<p><strong>Name:</strong> {$dbName}</p>";
         $body .= "<p><strong>Email:</strong> {$dbEmail}</p>";
 
-        if (!empty($dbPhone)) {
-            $body .= "<p><strong>Phone:</strong> {$dbPhone}</p>";
+        if (!empty($displayPhone)) {
+            $body .= "<p><strong>Phone:</strong> {$displayPhone}</p>";
         }
 
         $body .= "<p><strong>Subject:</strong> {$dbSubject}</p>";
@@ -292,7 +316,21 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "</div>";
 
         $mail->Body = $body;
-        $mail->AltBody = strip_tags($body);
+        
+        // Plain text version
+        $plainBody = "New Contact Form Submission\n";
+        $plainBody .= "============================\n\n";
+        $plainBody .= "Name: {$dbName}\n";
+        $plainBody .= "Email: {$dbEmail}\n";
+        if (!empty($displayPhone)) {
+            $plainBody .= "Phone: {$displayPhone}\n";
+        }
+        $plainBody .= "Subject: {$dbSubject}\n";
+        $plainBody .= "\nMessage:\n";
+        $plainBody .= "--------\n";
+        $plainBody .= strip_tags($dbMessage) . "\n";
+        
+        $mail->AltBody = $plainBody;
 
         $mail->send();
         $emailSent = true;
@@ -314,8 +352,8 @@ $responseData = [
     'subject' => $fields['subject']
 ];
 
-if (!empty($normalizedPhone)) {
-    $responseData['phone'] = $normalizedPhone;
+if (!empty($displayPhone)) {
+    $responseData['phone'] = $displayPhone;
 } elseif (!empty($fields['phone'])) {
     $responseData['phone'] = $fields['phone'];
 }
