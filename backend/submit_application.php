@@ -28,19 +28,16 @@ function jsonResponse(int $status, string $message, array $extra = []): void
 
     @ob_end_clean();
 
-    // Build consistent response structure
     $payload = [
         'status' => $status >= 200 && $status < 300 ? 'success' : 'error',
         'success' => $status >= 200 && $status < 300,
         'message' => $message
     ];
 
-    // Merge extra data
     foreach ($extra as $key => $value) {
         $payload[$key] = $value;
     }
 
-    // Ensure arrays are always arrays, not objects when empty
     if (isset($payload['errors']) && empty($payload['errors'])) {
         $payload['errors'] = [];
     }
@@ -73,7 +70,6 @@ if ($method !== 'POST') {
 $contentType = $_SERVER['CONTENT_TYPE'] ?? $_SERVER['HTTP_CONTENT_TYPE'] ?? '';
 $isJson = stripos($contentType, 'application/json') !== false;
 
-// Log request details for debugging
 error_log('Application Request - Content-Type: ' . $contentType);
 error_log('Application Request - Is JSON: ' . ($isJson ? 'YES' : 'NO'));
 
@@ -84,7 +80,6 @@ $data = [];
 $rawInput = file_get_contents('php://input');
 
 if ($isJson) {
-    // Parse JSON input
     $data = json_decode($rawInput, true);
     if (json_last_error() !== JSON_ERROR_NONE) {
         error_log('JSON Parse Error: ' . json_last_error_msg());
@@ -92,14 +87,12 @@ if ($isJson) {
         jsonResponse(400, 'Invalid JSON format in request.');
     }
 } else {
-    // Parse form data
     parse_str($rawInput, $data);
     if (empty($data)) {
         $data = $_POST;
     }
 }
 
-// Log received data
 error_log('Application Form Data: ' . print_r($data, true));
 
 /* =========================
@@ -130,7 +123,7 @@ try {
 }
 
 /* =========================
-   Field Extraction with HTML Form Field Name Mapping
+   Field Extraction with CORRECT HTML Form Field Name Mapping
 ========================= */
 function getField(array $data, array $possibleNames, string $default = ''): string
 {
@@ -142,61 +135,30 @@ function getField(array $data, array $possibleNames, string $default = ''): stri
     return $default;
 }
 
-// Map HTML field names (camelCase) to database column names (snake_case)
+// CORRECTED: Map HTML field names (camelCase) to database column names (snake_case)
 $fields = [
-    // Student Information - HTML: fullName → DB: full_name
+    // Student Information
     'full_name' => getField($data, ['fullName', 'full_name', 'name'], ''),
-
-    // HTML: dob → DB: date_of_birth
     'dob' => getField($data, ['dob', 'dateOfBirth', 'birth_date', 'birthdate'], ''),
-
-    // HTML: religion → DB: religion
     'religion' => getField($data, ['religion'], ''),
-
-    // HTML: classInterest → DB: class_interest
     'class_interest' => getField($data, ['classInterest', 'class_interest', 'class'], ''),
-
-    // HTML: gender → DB: gender
     'gender' => getField($data, ['gender', 'sex'], ''),
-
-    // HTML: address → DB: address
     'address' => getField($data, ['address', 'home_address'], ''),
-
-    // HTML: nationality → DB: nationality
     'nationality' => getField($data, ['nationality', 'country'], 'Nigeria'),
-
-    // HTML: state → DB: state
     'state' => getField($data, ['state', 'province', 'region'], ''),
-
-    // HTML: city → DB: city
     'city' => getField($data, ['city', 'town'], ''),
-
-    // NEW: HTML: studentPhone → DB: student_phone
     'student_phone' => getField($data, ['studentPhone', 'student_phone', 'phone'], ''),
-
-    // NEW: HTML: studentEmail → DB: student_email
     'student_email' => getField($data, ['studentEmail', 'student_email'], ''),
-
-    // Parent Information - HTML: motherName → DB: mother_name
+    
+    // Parent Information
     'mother_name' => getField($data, ['motherName', 'mother_name', 'mother'], ''),
-
-    // HTML: fatherName → DB: father_name
     'father_name' => getField($data, ['fatherName', 'father_name', 'father'], ''),
-
-    // HTML: motherPhone → DB: mother_phone
     'mother_phone' => getField($data, ['motherPhone', 'mother_phone', 'mother_contact'], ''),
-
-    // HTML: fatherPhone → DB: father_phone
     'father_phone' => getField($data, ['fatherPhone', 'father_phone', 'father_contact'], ''),
-
-    // HTML: parentEmail → DB: parent_email
     'parent_email' => getField($data, ['parentEmail', 'parent_email', 'email'], ''),
-
-    // HTML: parentAddress → DB: parent_address
     'parent_address' => getField($data, ['parentAddress', 'parent_address'], '')
 ];
 
-// Log extracted fields
 error_log('Extracted Fields: ' . print_r($fields, true));
 
 /* =========================
@@ -276,7 +238,7 @@ if (empty($fields['parent_address'])) {
     $errors['parentAddress'] = 'Parent address is required';
 }
 
-// OPTIONAL FIELDS with basic validation (student email and phone)
+// OPTIONAL FIELDS with basic validation
 if (!empty($fields['student_email']) && !filter_var($fields['student_email'], FILTER_VALIDATE_EMAIL)) {
     if (!preg_match('/^[^@]+@[^@]+\.[^@]+$/', $fields['student_email'])) {
         $warnings['studentEmail'] = 'Student email format appears incorrect';
@@ -286,7 +248,6 @@ if (!empty($fields['student_email']) && !filter_var($fields['student_email'], FI
 // Date of Birth validation
 $dobFormatted = '';
 if (!empty($fields['dob'])) {
-    // Try multiple date formats
     $formats = ['Y-m-d', 'd/m/Y', 'm/d/Y', 'd-m-Y', 'm-d-Y'];
     $dateValid = false;
 
@@ -296,7 +257,6 @@ if (!empty($fields['dob'])) {
             $currentYear = (int) date('Y');
             $birthYear = (int) $date->format('Y');
 
-            // Check if birth year is reasonable (between 1900 and current year)
             if ($birthYear >= 1900 && $birthYear <= $currentYear) {
                 $dobFormatted = $date->format('Y-m-d');
                 $dateValid = true;
@@ -305,7 +265,6 @@ if (!empty($fields['dob'])) {
         }
     }
 
-    // If formal parsing fails, try strtotime as last resort
     if (!$dateValid) {
         $timestamp = strtotime($fields['dob']);
         if ($timestamp !== false) {
@@ -332,7 +291,6 @@ function normalizePhoneSimple(string $phone): string
         return '';
     }
 
-    // Remove all non-digit characters except leading +
     $phone = trim($phone);
     $digits = preg_replace('/\D/', '', $phone);
 
@@ -340,17 +298,14 @@ function normalizePhoneSimple(string $phone): string
         return '';
     }
 
-    // Handle Nigerian numbers specifically
     if (strlen($digits) === 11 && strpos($digits, '0') === 0) {
         return '234' . substr($digits, 1);
     }
 
-    // If it already starts with country code, return as is
     if (strlen($digits) >= 10 && strlen($digits) <= 15) {
         return $digits;
     }
 
-    // Return original if can't normalize
     return $phone;
 }
 
@@ -368,7 +323,6 @@ if (!empty($fatherPhone) && (strlen($fatherPhone) < 10 || strlen($fatherPhone) >
     $errors['fatherPhone'] = 'Father phone number must be 10-15 digits';
 }
 
-// Student phone is optional, only validate if provided
 if (!empty($studentPhone) && (strlen($studentPhone) < 10 || strlen($studentPhone) > 15)) {
     $warnings['studentPhone'] = 'Student phone number may be invalid';
 }
@@ -389,11 +343,12 @@ if (!empty($errors)) {
 $applicationId = 'APP' . date('Ymd') . strtoupper(substr(uniqid(), -6));
 
 /* =========================
-   Prepare data for database
+   Prepare data for database - CORRECT PARAMETER NAMES
 ========================= */
+// IMPORTANT: Parameter names MUST match exactly what's in the SQL query
 $dbData = [
     ':full_name' => htmlspecialchars($fields['full_name'], ENT_QUOTES, 'UTF-8'),
-    ':dob' => $dobFormatted,
+    ':date_of_birth' => $dobFormatted, // CHANGED from :dob to :date_of_birth
     ':religion' => htmlspecialchars($fields['religion'], ENT_QUOTES, 'UTF-8'),
     ':class_interest' => htmlspecialchars($fields['class_interest'], ENT_QUOTES, 'UTF-8'),
     ':gender' => htmlspecialchars($fields['gender'], ENT_QUOTES, 'UTF-8'),
@@ -412,36 +367,42 @@ $dbData = [
     ':application_id' => $applicationId,
 ];
 
+error_log('Application DB Data: ' . print_r($dbData, true));
+
 /* =========================
-   Save to Database
+   Save to Database - CORRECT SQL WITH MATCHING PARAMETERS
 ========================= */
 try {
-    // Log data before insertion
-    error_log('Application DB Data: ' . print_r($dbData, true));
-
+    // CORRECTED SQL query with matching parameter names
     $stmt = $pdo->prepare("
         INSERT INTO applications (
             full_name, date_of_birth, religion, class_interest, gender, address,
             nationality, state, city, student_phone, student_email, 
             mother_name, father_name, mother_phone, father_phone, 
             parent_email, parent_address,
-            submission_date, status, application_id, ip_address
+            submission_date, status, application_id
         ) VALUES (
-            :full_name, :dob, :religion, :class_interest, :gender, :address,
+            :full_name, :date_of_birth, :religion, :class_interest, :gender, :address,
             :nationality, :state, :city, :student_phone, :student_email,
             :mother_name, :father_name, :mother_phone, :father_phone,
             :parent_email, :parent_address,
-            NOW(), 'pending', :application_id, :ip_address
+            NOW(), 'pending', :application_id
         )
     ");
 
+    // Log the SQL for debugging
+    error_log('Prepared SQL: ' . $stmt->queryString);
+    
+    // Execute with parameters
     $stmt->execute($dbData);
 
     $insertId = $pdo->lastInsertId();
-    error_log("Application saved successfully. App ID: $applicationId");
+    error_log("Application saved successfully. App ID: $applicationId, DB ID: $insertId");
 
 } catch (Throwable $e) {
     error_log('Database insert error: ' . $e->getMessage());
+    error_log('SQL Error Info: ' . print_r($stmt->errorInfo() ?? [], true));
+    error_log('Data being inserted: ' . print_r($dbData, true));
     jsonResponse(500, 'We could not save your application. Please try again later.');
 }
 
@@ -474,7 +435,7 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $mail->isHTML(true);
         $mail->Subject = "New Application Submitted: {$applicationId} - " . htmlspecialchars($fields['full_name']);
 
-        // Build email body with comprehensive details - NO EMOJIS
+        // Build email body
         $body = "<h3 style='color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;'>
                 New Student Application - {$applicationId}</h3>";
 
@@ -528,7 +489,6 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<ul style='margin: 10px 0 0 0; padding-left: 20px;'>";
         $body .= "<li>Contact parent at: " . $motherPhone . " (Mother) or " . $fatherPhone . " (Father)</li>";
         $body .= "<li>Follow up via email: " . htmlspecialchars($fields['parent_email']) . "</li>";
-        $body .= "<li>Application status can be updated in the database</li>";
         $body .= "</ul>";
         $body .= "</div>";
 
@@ -539,7 +499,7 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
 
         $mail->Body = $body;
 
-        // Plain text alternative - NO EMOJIS
+        // Plain text alternative
         $plainBody = "NEW STUDENT APPLICATION\n";
         $plainBody .= "=======================\n\n";
         $plainBody .= "Application ID: {$applicationId}\n";
@@ -611,28 +571,21 @@ $responseData = [
     'mother_name' => $fields['mother_name'],
     'father_name' => $fields['father_name'],
     'parent_email' => $fields['parent_email'],
-    'parent_address' => $fields['parent_address']
+    'parent_address' => $fields['parent_address'],
+    'address' => $fields['address'],
 ];
 
-// Add student phone and email if provided
 if (!empty($studentPhone)) {
     $responseData['student_phone'] = $studentPhone;
 }
 if (!empty($fields['student_email'])) {
     $responseData['student_email'] = $fields['student_email'];
 }
-
-// Add parent phone numbers if they exist
 if (!empty($motherPhone)) {
     $responseData['mother_phone'] = $motherPhone;
 }
 if (!empty($fatherPhone)) {
     $responseData['father_phone'] = $fatherPhone;
-}
-
-// Add address
-if (!empty($fields['address'])) {
-    $responseData['address'] = $fields['address'];
 }
 
 /* =========================
