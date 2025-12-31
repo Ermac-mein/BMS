@@ -13,44 +13,22 @@ use PHPMailer\PHPMailer\Exception;
 require __DIR__ . '/../vendor/autoload.php';
 
 /* =========================
-   JSON Response Helper
+   Load DB Config
 ========================= */
-function jsonResponse(int $status, string $message, array $extra = []): void
-{
-    if (!headers_sent()) {
-        http_response_code($status);
-        header('Content-Type: application/json; charset=UTF-8');
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Allow-Headers: Content-Type, Accept, Origin, X-Requested-With');
-        header('Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT');
-        header('Access-Control-Max-Age: 86400');
-    }
-
-    @ob_end_clean();
-
-    $payload = [
-        'status' => $status >= 200 && $status < 300 ? 'success' : 'error',
-        'success' => $status >= 200 && $status < 300,
-        'message' => $message
-    ];
-
-    foreach ($extra as $key => $value) {
-        $payload[$key] = $value;
-    }
-
-    if (isset($payload['errors']) && empty($payload['errors'])) {
-        $payload['errors'] = [];
-    }
-    if (isset($payload['warnings']) && empty($payload['warnings'])) {
-        $payload['warnings'] = [];
-    }
-    if (isset($payload['data']) && empty($payload['data'])) {
-        $payload['data'] = [];
-    }
-
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+$dbFile = __DIR__ . '/config/database.php';
+if (!file_exists($dbFile)) {
+    error_log('Database config file missing: ' . $dbFile);
+    header('Content-Type: application/json; charset=UTF-8');
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'success' => false,
+        'message' => 'Server misconfiguration. Please try again later.'
+    ], JSON_UNESCAPED_UNICODE);
     exit;
 }
+
+require_once $dbFile;
 
 /* =========================
    Request Method Handling
@@ -61,7 +39,14 @@ if ($method === 'OPTIONS') {
     exit;
 }
 if ($method !== 'POST') {
-    jsonResponse(405, 'Please submit the form using POST method.');
+    header('Content-Type: application/json; charset=UTF-8');
+    http_response_code(405);
+    echo json_encode([
+        'status' => 'error',
+        'success' => false,
+        'message' => 'Please submit the form using POST method.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 /* =========================
@@ -84,7 +69,14 @@ if ($isJson) {
     if (json_last_error() !== JSON_ERROR_NONE) {
         error_log('JSON Parse Error: ' . json_last_error_msg());
         error_log('Raw Input: ' . $rawInput);
-        jsonResponse(400, 'Invalid JSON format in request.');
+        header('Content-Type: application/json; charset=UTF-8');
+        http_response_code(400);
+        echo json_encode([
+            'status' => 'error',
+            'success' => false,
+            'message' => 'Invalid JSON format in request.'
+        ], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 } else {
     parse_str($rawInput, $data);
@@ -96,22 +88,6 @@ if ($isJson) {
 error_log('Application Form Data: ' . print_r($data, true));
 
 /* =========================
-   Load DB Config
-========================= */
-$dbFile = __DIR__ . '/config/database.php';
-if (!file_exists($dbFile)) {
-    error_log('Database config file missing: ' . $dbFile);
-    jsonResponse(500, 'Server misconfiguration. Please try again later.');
-}
-
-require_once $dbFile;
-
-if (!function_exists('getDatabaseConnection')) {
-    error_log('Database connection function not found');
-    jsonResponse(500, 'Server misconfiguration. Database unavailable.');
-}
-
-/* =========================
    Database Connection
 ========================= */
 try {
@@ -119,7 +95,14 @@ try {
     $pdo->query('SELECT 1');
 } catch (Throwable $e) {
     error_log('DB Connection failed: ' . $e->getMessage());
-    jsonResponse(500, 'Service temporarily unavailable. Please try again later.');
+    header('Content-Type: application/json; charset=UTF-8');
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'success' => false,
+        'message' => 'Service temporarily unavailable. Please try again later.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 /* =========================
@@ -135,9 +118,7 @@ function getField(array $data, array $possibleNames, string $default = ''): stri
     return $default;
 }
 
-// CORRECTED: Map HTML field names (camelCase) to database column names (snake_case)
 $fields = [
-    // Student Information
     'full_name' => getField($data, ['fullName', 'full_name', 'name'], ''),
     'dob' => getField($data, ['dob', 'dateOfBirth', 'birth_date', 'birthdate'], ''),
     'religion' => getField($data, ['religion'], ''),
@@ -149,8 +130,7 @@ $fields = [
     'city' => getField($data, ['city', 'town'], ''),
     'student_phone' => getField($data, ['studentPhone', 'student_phone', 'phone'], ''),
     'student_email' => getField($data, ['studentEmail', 'student_email'], ''),
-    
-    // Parent Information
+
     'mother_name' => getField($data, ['motherName', 'mother_name', 'mother'], ''),
     'father_name' => getField($data, ['fatherName', 'father_name', 'father'], ''),
     'mother_phone' => getField($data, ['motherPhone', 'mother_phone', 'mother_contact'], ''),
@@ -167,7 +147,6 @@ error_log('Extracted Fields: ' . print_r($fields, true));
 $errors = [];
 $warnings = [];
 
-// REQUIRED FIELDS (matching HTML form requirements)
 if (empty($fields['full_name'])) {
     $errors['fullName'] = 'Student full name is required';
 } elseif (strlen($fields['full_name']) < 3) {
@@ -238,14 +217,12 @@ if (empty($fields['parent_address'])) {
     $errors['parentAddress'] = 'Parent address is required';
 }
 
-// OPTIONAL FIELDS with basic validation
 if (!empty($fields['student_email']) && !filter_var($fields['student_email'], FILTER_VALIDATE_EMAIL)) {
     if (!preg_match('/^[^@]+@[^@]+\.[^@]+$/', $fields['student_email'])) {
         $warnings['studentEmail'] = 'Student email format appears incorrect';
     }
 }
 
-// Date of Birth validation
 $dobFormatted = '';
 if (!empty($fields['dob'])) {
     $formats = ['Y-m-d', 'd/m/Y', 'm/d/Y', 'd-m-Y', 'm-d-Y'];
@@ -284,7 +261,6 @@ if (!empty($fields['dob'])) {
     }
 }
 
-// Phone number validation
 function normalizePhoneSimple(string $phone): string
 {
     if (empty($phone)) {
@@ -309,12 +285,10 @@ function normalizePhoneSimple(string $phone): string
     return $phone;
 }
 
-// Normalize phone numbers
 $motherPhone = normalizePhoneSimple($fields['mother_phone']);
 $fatherPhone = normalizePhoneSimple($fields['father_phone']);
 $studentPhone = normalizePhoneSimple($fields['student_phone']);
 
-// Check phone lengths if provided
 if (!empty($motherPhone) && (strlen($motherPhone) < 10 || strlen($motherPhone) > 15)) {
     $errors['motherPhone'] = 'Mother phone number must be 10-15 digits';
 }
@@ -331,10 +305,16 @@ if (!empty($studentPhone) && (strlen($studentPhone) < 10 || strlen($studentPhone
    Return validation errors if any
 ========================= */
 if (!empty($errors)) {
-    jsonResponse(422, 'Please fix the following errors:', [
+    header('Content-Type: application/json; charset=UTF-8');
+    http_response_code(422);
+    echo json_encode([
+        'status' => 'error',
+        'success' => false,
+        'message' => 'Please fix the following errors:',
         'errors' => $errors,
         'warnings' => $warnings
-    ]);
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 /* =========================
@@ -343,12 +323,11 @@ if (!empty($errors)) {
 $applicationId = 'APP' . date('Ymd') . strtoupper(substr(uniqid(), -6));
 
 /* =========================
-   Prepare data for database - CORRECT PARAMETER NAMES
+   Prepare data for database
 ========================= */
-// IMPORTANT: Parameter names MUST match exactly what's in the SQL query
 $dbData = [
     ':full_name' => htmlspecialchars($fields['full_name'], ENT_QUOTES, 'UTF-8'),
-    ':date_of_birth' => $dobFormatted, // CHANGED from :dob to :date_of_birth
+    ':date_of_birth' => $dobFormatted,
     ':religion' => htmlspecialchars($fields['religion'], ENT_QUOTES, 'UTF-8'),
     ':class_interest' => htmlspecialchars($fields['class_interest'], ENT_QUOTES, 'UTF-8'),
     ':gender' => htmlspecialchars($fields['gender'], ENT_QUOTES, 'UTF-8'),
@@ -370,10 +349,9 @@ $dbData = [
 error_log('Application DB Data: ' . print_r($dbData, true));
 
 /* =========================
-   Save to Database - CORRECT SQL WITH MATCHING PARAMETERS
+   Save to Database
 ========================= */
 try {
-    // CORRECTED SQL query with matching parameter names
     $stmt = $pdo->prepare("
         INSERT INTO applications (
             full_name, date_of_birth, religion, class_interest, gender, address,
@@ -390,10 +368,8 @@ try {
         )
     ");
 
-    // Log the SQL for debugging
     error_log('Prepared SQL: ' . $stmt->queryString);
-    
-    // Execute with parameters
+
     $stmt->execute($dbData);
 
     $insertId = $pdo->lastInsertId();
@@ -403,7 +379,14 @@ try {
     error_log('Database insert error: ' . $e->getMessage());
     error_log('SQL Error Info: ' . print_r($stmt->errorInfo() ?? [], true));
     error_log('Data being inserted: ' . print_r($dbData, true));
-    jsonResponse(500, 'We could not save your application. Please try again later.');
+    header('Content-Type: application/json; charset=UTF-8');
+    http_response_code(500);
+    echo json_encode([
+        'status' => 'error',
+        'success' => false,
+        'message' => 'We could not save your application. Please try again later.'
+    ], JSON_UNESCAPED_UNICODE);
+    exit;
 }
 
 /* =========================
@@ -414,20 +397,17 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
     try {
         $mail = new PHPMailer(true);
 
-        // SMTP Configuration
         $mail->isSMTP();
         $mail->Host = SMTP_HOST;
         $mail->SMTPAuth = true;
-        $mail->Username = defined('SMTP_USER') ? SMTP_USER : '';
-        $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : '';
+        $mail->Username = defined('SMTP_USER') ? SMTP_USER : SCHOOL_EMAIL;
+        $mail->Password = defined('SMTP_PASS') ? SMTP_PASS : 'uosk qqgm ctsm kjcc';
         $mail->SMTPSecure = defined('SMTP_SECURE') ? constant('SMTP_SECURE') : 'tls';
         $mail->Port = defined('SMTP_PORT') ? constant('SMTP_PORT') : 587;
 
-        // Email content
         $mail->setFrom(SMTP_FROM, 'Beautiful Minds Schools');
         $mail->addAddress(SMTP_FROM);
 
-        // Add reply-to for parent email
         if (filter_var($fields['parent_email'], FILTER_VALIDATE_EMAIL)) {
             $mail->addReplyTo($fields['parent_email'], $fields['full_name'] . "'s Parent");
         }
@@ -435,7 +415,6 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $mail->isHTML(true);
         $mail->Subject = "New Application Submitted: {$applicationId} - " . htmlspecialchars($fields['full_name']);
 
-        // Build email body
         $body = "<h3 style='color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;'>
                 New Student Application - {$applicationId}</h3>";
 
@@ -445,7 +424,6 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<p><strong>Application ID:</strong> <code>{$applicationId}</code></p>";
         $body .= "</div>";
 
-        // Student Information Section
         $body .= "<h4 style='color: #2c3e50;'>Student Information</h4>";
         $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
         $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Full Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['full_name']) . "</td></tr>";
@@ -463,7 +441,6 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         }
         $body .= "</table>";
 
-        // Contact Information Section
         $body .= "<h4 style='color: #2c3e50;'>Contact Information</h4>";
         $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
         $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Address</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['address']) . "</td></tr>";
@@ -472,7 +449,6 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Nationality</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['nationality']) . "</td></tr>";
         $body .= "</table>";
 
-        // Parent Information Section
         $body .= "<h4 style='color: #2c3e50;'>Parent Information</h4>";
         $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
         $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Mother's Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['mother_name']) . "</td></tr>";
@@ -483,28 +459,24 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Parent Address</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>" . htmlspecialchars($fields['parent_address']) . "</td></tr>";
         $body .= "</table>";
 
-        // Footer with action items
         $body .= "<div style='background: #e8f4fc; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; margin-top: 20px;'>";
         $body .= "<p style='margin: 0;'><strong>Next Steps:</strong></p>";
         $body .= "<ul style='margin: 10px 0 0 0; padding-left: 20px;'>";
-        $body .= "<li>Contact parent at: " . $motherPhone . " (Mother) or " . $fatherPhone . " (Father)</li>";
+        $body .= "<li>Contact parent at: ". $motherPhone . " (Mother) or " . $fatherPhone . " (Father)</li>";
         $body .= "<li>Follow up via email: " . htmlspecialchars($fields['parent_email']) . "</li>";
         $body .= "</ul>";
         $body .= "</div>";
 
-        // System note
         $body .= "<p style='color: #7f8c8d; font-size: 12px; margin-top: 20px; border-top: 1px solid #ecf0f1; padding-top: 10px;'>";
         $body .= "This email was automatically generated by the Beautiful Minds Schools application system.";
         $body .= "</p>";
 
         $mail->Body = $body;
 
-        // Plain text alternative
         $plainBody = "NEW STUDENT APPLICATION\n";
         $plainBody .= "=======================\n\n";
         $plainBody .= "Application ID: {$applicationId}\n";
         $plainBody .= "Submission Time: " . date('F j, Y, g:i a') . "\n";
-        $plainBody .= "Database ID: {$insertId}\n\n";
 
         $plainBody .= "STUDENT INFORMATION\n";
         $plainBody .= "-------------------\n";
@@ -541,7 +513,6 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $plainBody .= "NEXT STEPS:\n";
         $plainBody .= "* Contact parent at: " . $motherPhone . " (Mother) or " . $fatherPhone . " (Father)\n";
         $plainBody .= "* Follow up via email: " . $fields['parent_email'] . "\n";
-        $plainBody .= "* Update application status in database\n";
 
         $mail->AltBody = $plainBody;
 
@@ -591,11 +562,17 @@ if (!empty($fatherPhone)) {
 /* =========================
    Success Response
 ========================= */
-jsonResponse(200, 'Application submitted successfully! Our admissions team will contact you within 2-3 business days.', [
+header('Content-Type: application/json; charset=UTF-8');
+http_response_code(200);
+echo json_encode([
+    'status' => 'success',
+    'success' => true,
+    'message' => 'Application submitted successfully! Our admissions team will contact you within 2-3 business days.',
     'application_id' => $applicationId,
     'emailSent' => $emailSent,
     'warnings' => $warnings,
     'databaseSaved' => true,
     'data' => $responseData
-]);
+], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+exit;
 ?>

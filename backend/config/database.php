@@ -5,25 +5,34 @@ declare(strict_types=1);
    ENVIRONMENT
 ======================== */
 define('APP_ENV', getenv('APP_ENV') ?: 'production');
-define('APP_DEBUG', APP_ENV !== 'production');
+define('APP_DEBUG', APP_ENV === 'development');
 date_default_timezone_set(getenv('APP_TIMEZONE') ?: 'Africa/Lagos');
 
 /* ========================
    ERROR HANDLING
 ======================== */
-error_reporting(APP_DEBUG ? E_ALL : 0);
-ini_set('display_errors', APP_DEBUG ? '1' : '0');
+if (APP_DEBUG) {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+    ini_set('display_startup_errors', '1');
+} else {
+    error_reporting(0);
+    ini_set('display_errors', '0');
+    ini_set('display_startup_errors', '0');
+}
+
 ini_set('log_errors', '1');
 
 $logDir = realpath(__DIR__ . '/../logs') ?: __DIR__ . '/../logs';
-if (!is_dir($logDir))
+if (!is_dir($logDir)) {
     mkdir($logDir, 0755, true);
+}
 ini_set('error_log', $logDir . '/php-error.log');
 
 /* ========================
    SECURITY HEADERS
 ======================== */
-if (!headers_sent()) {
+if (!headers_sent() && php_sapi_name() !== 'cli') {
     header('X-Content-Type-Options: nosniff');
     header('X-Frame-Options: SAMEORIGIN');
     header('X-XSS-Protection: 1; mode=block');
@@ -81,25 +90,32 @@ function getDatabaseConnection(int $retries = 3, int $delaySeconds = 2): PDO
     global $dbHost, $dbName, $dbUser, $dbPass, $dbPort;
 
     if ($pdo instanceof PDO) {
-        return $pdo;
+        try {
+            $pdo->query('SELECT 1');
+            return $pdo;
+        } catch (PDOException $e) {
+            // Connection lost, reinitialize
+            $pdo = null;
+        }
     }
 
     $lastError = null;
+    $dsn = sprintf(
+        'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
+        $dbHost,
+        $dbPort,
+        $dbName
+    );
 
     for ($attempt = 1; $attempt <= $retries; $attempt++) {
         try {
-            $dsn = sprintf(
-                'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-                $dbHost,
-                $dbPort,
-                $dbName
-            );
-
             $pdo = new PDO($dsn, $dbUser, $dbPass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_EMULATE_PREPARES => false,
                 PDO::ATTR_TIMEOUT => 5,
+                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci",
+                PDO::ATTR_PERSISTENT => false,
             ]);
 
             return $pdo;
@@ -107,33 +123,32 @@ function getDatabaseConnection(int $retries = 3, int $delaySeconds = 2): PDO
         } catch (PDOException $e) {
             $lastError = $e;
             error_log("DB CONNECTION ATTEMPT {$attempt} FAILED: " . $e->getMessage());
-            sleep($delaySeconds);
+
+            if ($attempt < $retries) {
+                sleep($delaySeconds);
+            }
         }
     }
 
-    // Final failure response
-    if (!headers_sent() && str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => false,
-            'message' => APP_DEBUG ? $lastError->getMessage() : 'Database unavailable'
-        ]);
-        exit;
-    }
-
-    die(APP_DEBUG ? $lastError->getMessage() : 'Service unavailable');
+    // Final failure - throw exception instead of calling jsonResponse
+    throw new PDOException('Database connection failed after ' . $retries . ' attempts: ' . $lastError->getMessage());
 }
-
 
 /* ========================
    EMAIL SENDING
 ======================== */
-function sendEmail(string $to, string $subject, string $body, bool $isHTML = true, string $replyTo = ''): bool
+function sendEmail(string $to, string $subject, string $body, bool $isHTML = true, string $replyTo = '', array $cc = [], array $bcc = []): bool
 {
-    if (class_exists(\PHPMailer\PHPMailer\PHPMailer::class)) {
+    // Check if PHPMailer is available
+    $phpmailerAvailable = class_exists('PHPMailer\PHPMailer\PHPMailer') &&
+        class_exists('PHPMailer\PHPMailer\SMTP') &&
+        class_exists('PHPMailer\PHPMailer\Exception');
+
+    if ($phpmailerAvailable) {
         try {
             $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+            // SMTP Configuration
             $mail->isSMTP();
             $mail->Host = SMTP_HOST;
             $mail->SMTPAuth = true;
@@ -143,66 +158,218 @@ function sendEmail(string $to, string $subject, string $body, bool $isHTML = tru
             $mail->Port = SMTP_PORT;
             $mail->CharSet = 'UTF-8';
 
-            $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
-            $mail->addAddress($to);
-            if ($replyTo)
-                $mail->addReplyTo($replyTo);
+            // SMTP Debugging for development
+            if (APP_DEBUG) {
+                $mail->SMTPDebug = 2;
+                $mail->Debugoutput = function ($str, $level) {
+                    error_log("PHPMailer: $str");
+                };
+            }
 
+            // From address
+            $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
+
+            // Recipients
+            $mail->addAddress($to);
+
+            // Reply-To
+            if ($replyTo) {
+                $mail->addReplyTo($replyTo);
+            }
+
+            // CC recipients
+            foreach ($cc as $ccEmail) {
+                $mail->addCC($ccEmail);
+            }
+
+            // BCC recipients
+            foreach ($bcc as $bccEmail) {
+                $mail->addBCC($bccEmail);
+            }
+
+            // Email content
             $mail->isHTML($isHTML);
             $mail->Subject = $subject;
-            $mail->Body = $body . getEmailSignature(true);
-            $mail->AltBody = strip_tags($body) . getEmailSignature(false);
 
-            $mail->send();
-            return true;
-        } catch (Throwable $e) {
-            error_log('PHPMailer Error: ' . $e->getMessage());
+            if ($isHTML) {
+                $mail->Body = $body . getEmailSignature(true);
+                $mail->AltBody = strip_tags($body) . getEmailSignature(false);
+            } else {
+                $mail->Body = $body . getEmailSignature(false);
+            }
+
+            // Send email
+            if ($mail->send()) {
+                return true;
+            } else {
+                error_log('PHPMailer Error: Send failed');
+                return false;
+            }
+
+        } catch (Exception $e) {
+            error_log('PHPMailer Exception: ' . $e->getMessage());
+            // Fall back to native mail
         }
     }
 
+    // Fallback to native mail function
     return sendEmailNative($to, $subject, $body, $isHTML, $replyTo);
 }
 
 function sendEmailNative(string $to, string $subject, string $body, bool $isHTML = true, string $replyTo = ''): bool
 {
     $headers = [
-        'From: ' . SCHOOL_NAME . ' <' . SCHOOL_EMAIL . '>',
-        'Reply-To: ' . ($replyTo ?: SCHOOL_EMAIL),
+        'From: ' . SMTP_FROM_NAME . ' <' . SMTP_FROM . '>',
+        'Reply-To: ' . ($replyTo ?: SMTP_FROM),
         'MIME-Version: 1.0',
-        'Content-Type: ' . ($isHTML ? 'text/html' : 'text/plain') . '; charset=UTF-8'
+        'X-Mailer: PHP/' . phpversion()
     ];
 
-    $sent = mail($to, $subject, $body . getEmailSignature($isHTML), implode("\r\n", $headers));
-    if (!$sent)
+    if ($isHTML) {
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+        $fullBody = '<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>' . htmlspecialchars($subject) . '</title>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+                .content { background: #f9f9f9; padding: 20px; border-radius: 5px; }
+                .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
+            </style>
+        </head>
+        <body>
+            <div class="content">' . $body . '</div>
+            <div class="footer">' . getEmailSignature(true) . '</div>
+        </body>
+        </html>';
+    } else {
+        $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+        $fullBody = $body . "\n\n" . getEmailSignature(false);
+    }
+
+    $headers = implode("\r\n", $headers);
+
+    $sent = mail($to, $subject, $fullBody, $headers);
+
+    if (!$sent) {
         logFailedEmail($to, $subject);
+    }
+
     return $sent;
 }
 
 function getEmailSignature(bool $isHTML): string
 {
-    return $isHTML
-        ? "<br><br><strong>" . SCHOOL_NAME . "</strong><br>" . SCHOOL_ADDRESS .
-        "<br>Phone: " . SCHOOL_PHONE . "<br>Email: " . SCHOOL_EMAIL
-        : "\n\n--\n" . SCHOOL_NAME . "\n" . SCHOOL_ADDRESS .
-        "\nPhone: " . SCHOOL_PHONE . "\nEmail: " . SCHOOL_EMAIL;
+    if ($isHTML) {
+        return '<div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; color: #666; font-size: 14px;">
+                <strong>' . SCHOOL_NAME . '</strong><br>
+                ' . SCHOOL_ADDRESS . '<br>
+                Phone: ' . SCHOOL_PHONE . ' | Email: ' . SCHOOL_EMAIL . '
+                </div>';
+    } else {
+        return "\n\n--\n" . SCHOOL_NAME . "\n" . SCHOOL_ADDRESS .
+            "\nPhone: " . SCHOOL_PHONE . " | Email: " . SCHOOL_EMAIL;
+    }
 }
 
 function logFailedEmail(string $to, string $subject): void
 {
     $dir = __DIR__ . '/../logs/email_failures';
-    if (!is_dir($dir))
+    if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
-    file_put_contents(
-        $dir . '/' . date('Y-m-d') . '.log',
-        '[' . date('H:i:s') . "] TO: $to | SUBJECT: $subject\n",
-        FILE_APPEND
-    );
+    }
+
+    $logEntry = '[' . date('Y-m-d H:i:s') . '] TO: ' . $to . ' | SUBJECT: ' . $subject . "\n";
+    file_put_contents($dir . '/' . date('Y-m-d') . '.log', $logEntry, FILE_APPEND);
 }
 
 /* ========================
-   AUTOLOAD PHPMailer
+   AUTOLOAD PHPMailer if not already loaded
 ======================== */
-$vendor = realpath(__DIR__ . '/../vendor');
-if ($vendor && file_exists($vendor . '/autoload.php')) {
-    require_once $vendor . '/autoload.php';
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    $vendorAutoload = realpath(__DIR__ . '/../vendor/autoload.php');
+    if ($vendorAutoload && file_exists($vendorAutoload)) {
+        require_once $vendorAutoload;
+    } else {
+        // Check for PHPMailer in common locations
+        $phpmailerPaths = [
+            __DIR__ . '/../vendor/phpmailer/phpmailer/src/PHPMailer.php',
+            __DIR__ . '/phpmailer/PHPMailer.php',
+            '/usr/share/php/PHPMailer/PHPMailer.php'
+        ];
+
+        foreach ($phpmailerPaths as $path) {
+            if (file_exists($path)) {
+                require_once $path;
+                require_once str_replace('PHPMailer.php', 'SMTP.php', $path);
+                require_once str_replace('PHPMailer.php', 'Exception.php', $path);
+                break;
+            }
+        }
+    }
 }
+
+/* ========================
+   COMMON FUNCTIONS
+======================== */
+function sanitizeInput($data): string
+{
+    if (is_array($data)) {
+        return '';
+    }
+
+    $data = trim((string) $data);
+    $data = stripslashes($data);
+    $data = htmlspecialchars($data, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+    return $data;
+}
+
+function validateEmail(string $email): bool
+{
+    if (empty($email)) {
+        return false;
+    }
+
+    // Basic email validation
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        return false;
+    }
+
+    // Check for common patterns
+    if (!preg_match('/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/', $email)) {
+        return false;
+    }
+
+    return true;
+}
+
+function normalizePhone(string $phone): string
+{
+    $phone = trim($phone);
+
+    // Remove all non-digit characters except leading +
+    $digits = preg_replace('/[^\d]/', '', $phone);
+
+    if (empty($digits)) {
+        return $phone; // Return original if no digits found
+    }
+
+    // Handle Nigerian numbers: convert 0XXXXXXXXXX to 234XXXXXXXXXX
+    if (strlen($digits) === 11 && substr($digits, 0, 1) === '0') {
+        return '234' . substr($digits, 1);
+    }
+
+    // Handle numbers with country code already
+    if (strlen($digits) >= 10 && strlen($digits) <= 15) {
+        return $digits;
+    }
+
+    return $phone; // Return original if can't normalize
+}
+
+// REMOVED: jsonResponse() function to prevent redeclaration errors
+// Each form handler now has its own inline JSON response handling
+?>
