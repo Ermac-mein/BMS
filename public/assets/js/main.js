@@ -32,7 +32,16 @@
         slideInterval: null,
         isMobileMenuOpen: false,
         isModalOpen: false,
-        isSubmitting: false
+        isSubmitting: false,
+        galleryImages: [
+            'slide1.png',
+            'slide2.png',
+            'slide3.png',
+            'classroom.png'
+            // Add more image filenames here as needed
+        ],
+        currentGallerySlide: 0,
+        galleryInterval: null
     };
 
     // ========================
@@ -50,7 +59,13 @@
         prevSlide: document.getElementById('prevSlide'),
         nextSlide: document.getElementById('nextSlide'),
         successMessage: document.getElementById('successMessage'),
-        header: document.getElementById('header')
+        header: document.getElementById('header'),
+        galleryTrack: document.getElementById('galleryTrack'),
+        galleryPrev: document.getElementById('galleryPrev'),
+        galleryNext: document.getElementById('galleryNext'),
+        galleryIndicators: document.getElementById('galleryIndicators'),
+        announcementToast: document.getElementById('announcement-toast'),
+        closeAnnouncement: document.getElementById('closeAnnouncement')
     };
 
     // ========================
@@ -215,7 +230,7 @@
                     z-index: 999999;
                     display: flex;
                     flex-direction: column;
-                    gap: 10px;
+                    gap: 12px;
                     max-width: 400px;
                     pointer-events: none;
                 `;
@@ -269,23 +284,23 @@
                 border: 1px solid ${config.border};
                 border-left: 4px solid ${config.border};
                 color: #1f2937;
-                padding: 16px 20px;
-                border-radius: 8px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+                padding: 18px 22px;
+                border-radius: 10px;
+                box-shadow: 0 12px 28px rgba(0,0,0,0.15);
                 opacity: 0;
-                transform: translateX(100px);
+                transform: translateX(120px);
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 pointer-events: auto;
                 display: flex;
                 align-items: flex-start;
-                gap: 12px;
-                max-width: 350px;
+                gap: 14px;
+                max-width: 380px;
                 animation: toastSlideIn 0.3s ease forwards;
             `;
 
             const icon = document.createElement('div');
             icon.style.cssText = `
-                font-size: 20px;
+                font-size: 22px;
                 font-weight: bold;
                 color: ${config.iconColor};
                 flex-shrink: 0;
@@ -302,16 +317,16 @@
             const titleEl = document.createElement('div');
             titleEl.style.cssText = `
                 font-weight: 600;
-                font-size: 15px;
-                margin-bottom: 4px;
+                font-size: 16px;
+                margin-bottom: 5px;
                 color: ${type === 'welcome' ? '#4b5563' : config.iconColor};
             `;
             titleEl.textContent = title;
 
             const messageEl = document.createElement('div');
             messageEl.style.cssText = `
-                font-size: 14px;
-                line-height: 1.4;
+                font-size: 15px;
+                line-height: 1.5;
                 color: ${type === 'welcome' ? '#6b7280' : '#374151'};
             `;
             messageEl.textContent = message;
@@ -322,7 +337,7 @@
                 background: none;
                 border: none;
                 color: ${type === 'welcome' ? '#6b7280' : '#374151'};
-                font-size: 20px;
+                font-size: 22px;
                 line-height: 1;
                 cursor: pointer;
                 padding: 0;
@@ -357,7 +372,7 @@
             if (!toast) return;
             clearTimeout(toast.dataset.timeoutId);
             toast.style.opacity = '0';
-            toast.style.transform = 'translateX(100px)';
+            toast.style.transform = 'translateX(120px)';
             setTimeout(() => {
                 if (toast.parentNode) {
                     toast.parentNode.removeChild(toast);
@@ -365,6 +380,54 @@
             }, 300);
         }
     };
+
+    // ========================
+    // Announcement Handler
+    // ========================
+    class Announcement {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            if (!dom.announcementToast) return;
+            
+            // Show welcome announcement immediately
+            setTimeout(() => {
+                Toast.show('info', 'Welcome', 'Welcome to Beautiful Minds Schools!');
+            }, 1000);
+            
+            // Show admission announcement after 1 minute
+            setTimeout(() => {
+                this.show();
+            }, 60000); // 1 minute = 60000 milliseconds
+            
+            this.setupEventListeners();
+        }
+
+        show() {
+            if (!dom.announcementToast) return;
+            
+            dom.announcementToast.classList.add('show');
+            utils.animateElement(dom.announcementToast, 'slideIn', 500);
+            
+            // Auto hide after 10 seconds
+            setTimeout(() => {
+                this.hide();
+            }, 10000);
+        }
+
+        hide() {
+            if (!dom.announcementToast) return;
+            
+            dom.announcementToast.classList.remove('show');
+            utils.animateElement(dom.announcementToast, 'slideOut', 500);
+        }
+
+        setupEventListeners() {
+            dom.closeAnnouncement?.addEventListener('click', () => this.hide());
+        }
+    }
 
     // ========================
     // Mobile Menu Handler
@@ -468,10 +531,10 @@
             
             if (scrolled) {
                 dom.header.style.transform = 'translateY(0)';
-                dom.header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
+                dom.header.style.boxShadow = '0 4px 24px rgba(0, 0, 0, 0.12)';
             } else {
                 dom.header.style.transform = 'translateY(0)';
-                dom.header.style.boxShadow = 'none';
+                dom.header.style.boxShadow = '0 2px 20px rgba(0, 0, 0, 0.1)';
             }
         }
     }
@@ -567,6 +630,149 @@
                 heroSlider.addEventListener('mouseleave', () => this.startAutoSlide());
                 heroSlider.addEventListener('touchstart', () => this.stopAutoSlide());
                 heroSlider.addEventListener('touchend', () => setTimeout(() => this.startAutoSlide(), 3000));
+            }
+        }
+    }
+
+    // ========================
+    // Gallery Slider
+    // ========================
+    class GallerySlider {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            if (!dom.galleryTrack) return;
+            
+            this.loadGalleryImages();
+            this.setupEventListeners();
+            this.startAutoSlide();
+        }
+
+        loadGalleryImages() {
+            if (!dom.galleryTrack || state.galleryImages.length === 0) return;
+            
+            // Clear existing slides
+            dom.galleryTrack.innerHTML = '';
+            dom.galleryIndicators.innerHTML = '';
+            
+            // Create slides
+            state.galleryImages.forEach((image, index) => {
+                const slide = document.createElement('div');
+                slide.className = 'gallery-slide';
+                slide.innerHTML = `
+                    <img src="assets/images/${image}" alt="Gallery Image ${index + 1}" loading="lazy">
+                `;
+                dom.galleryTrack.appendChild(slide);
+                
+                // Create indicator dot
+                const indicator = document.createElement('div');
+                indicator.className = 'gallery-indicator';
+                if (index === 0) indicator.classList.add('active');
+                indicator.dataset.index = index;
+                indicator.addEventListener('click', () => this.goToSlide(index));
+                dom.galleryIndicators.appendChild(indicator);
+            });
+            
+            this.updateGallery();
+        }
+
+        updateGallery() {
+            if (!dom.galleryTrack) return;
+            
+            const slideWidth = dom.galleryTrack.clientWidth / state.galleryImages.length;
+            
+            dom.galleryTrack.style.transform = `translateX(-${state.currentGallerySlide * slideWidth}px)`;
+            
+            // Update indicators
+            const indicators = utils.$$('.gallery-indicator');
+            indicators.forEach((indicator, index) => {
+                indicator.classList.toggle('active', index === state.currentGallerySlide);
+                if (index === state.currentGallerySlide) {
+                    utils.animateElement(indicator, 'pulse', 400);
+                }
+            });
+        }
+
+        nextSlide() {
+            state.currentGallerySlide = (state.currentGallerySlide + 1) % state.galleryImages.length;
+            this.updateGallery();
+        }
+
+        prevSlide() {
+            state.currentGallerySlide = (state.currentGallerySlide - 1 + state.galleryImages.length) % state.galleryImages.length;
+            this.updateGallery();
+        }
+
+        goToSlide(index) {
+            if (index >= 0 && index < state.galleryImages.length) {
+                state.currentGallerySlide = index;
+                this.updateGallery();
+            }
+        }
+
+        startAutoSlide() {
+            clearInterval(state.galleryInterval);
+            state.galleryInterval = setInterval(() => {
+                this.nextSlide();
+            }, 5000); // Change slide every 5 seconds
+        }
+
+        stopAutoSlide() {
+            clearInterval(state.galleryInterval);
+        }
+
+        setupEventListeners() {
+            dom.galleryPrev?.addEventListener('click', () => {
+                this.prevSlide();
+                this.startAutoSlide();
+                utils.animateElement(dom.galleryPrev, 'pulse', 300);
+            });
+            
+            dom.galleryNext?.addEventListener('click', () => {
+                this.nextSlide();
+                this.startAutoSlide();
+                utils.animateElement(dom.galleryNext, 'pulse', 300);
+            });
+            
+            // Touch support for mobile
+            let startX = 0;
+            let isDragging = false;
+            
+            const galleryContainer = document.querySelector('.gallery-slider');
+            if (galleryContainer) {
+                galleryContainer.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                    this.stopAutoSlide();
+                });
+                
+                galleryContainer.addEventListener('touchmove', (e) => {
+                    if (!isDragging) return;
+                    const currentX = e.touches[0].clientX;
+                    const diff = startX - currentX;
+                    
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            this.nextSlide();
+                        } else {
+                            this.prevSlide();
+                        }
+                        isDragging = false;
+                    }
+                });
+                
+                galleryContainer.addEventListener('touchend', () => {
+                    isDragging = false;
+                    this.startAutoSlide();
+                });
+            }
+            
+            // Pause auto-slide on hover
+            if (galleryContainer) {
+                galleryContainer.addEventListener('mouseenter', () => this.stopAutoSlide());
+                galleryContainer.addEventListener('mouseleave', () => this.startAutoSlide());
             }
         }
     }
@@ -792,10 +998,10 @@
                 });
             }, observerOptions);
             
-            utils.$$('.feature, .step, .contact-item, .curriculum-info, .about-img').forEach(el => {
+            utils.$$('.card, .step, .contact-item, .curriculum-info, .objective-item').forEach(el => {
                 if (el) {
                     el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
+                    el.style.transform = 'translateY(30px)';
                     el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
                     observer.observe(el);
                 }
@@ -804,7 +1010,7 @@
     }
 
     // ========================
-    // Form Handler (UPDATED)
+    // Form Handler
     // ========================
     class FormHandler {
         constructor(form, endpoint, successMessage, options = {}) {
@@ -1208,8 +1414,13 @@
                 to { opacity: 1; transform: translateX(0); }
             }
             
+            @keyframes slideOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(120px); }
+            }
+            
             @keyframes toastSlideIn {
-                from { opacity: 0; transform: translateX(100px); }
+                from { opacity: 0; transform: translateX(120px); }
                 to { opacity: 1; transform: translateX(0); }
             }
             
@@ -1230,8 +1441,8 @@
             
             .form-feedback {
                 display: block;
-                margin-top: 6px;
-                font-size: 0.875rem;
+                margin-top: 8px;
+                font-size: 0.9rem;
                 font-weight: 500;
                 animation: slideIn 0.3s ease;
             }
@@ -1437,6 +1648,8 @@
             new HeaderScroll();
             new HeroSlider();
             new CurriculumTabs();
+            new GallerySlider();
+            new Announcement();
             Modal.init();
             new SmoothScrolling();
             new ScrollAnimations();
@@ -1478,11 +1691,6 @@
             
             setTimeout(() => {
                 document.body.style.opacity = '1';
-                
-                // Show welcome toast
-                setTimeout(() => {
-                    Toast.show('info', 'Welcome', 'Welcome to Beautiful Minds Schools!');
-                }, 1000);
             }, 100);
             
         } catch (error) {
