@@ -67,7 +67,7 @@ if ($databaseUrl) {
 ======================== */
 define('SCHOOL_NAME', getenv('SCHOOL_NAME') ?: 'Beautiful Minds Schools');
 define('SCHOOL_EMAIL', getenv('SCHOOL_EMAIL') ?: 'beautifulmindsschools@gmail.com');
-define('SCHOOL_PHONE', getenv('SCHOOL_PHONE') ?: '+2347033546935');
+define('SCHOOL_PHONE', getenv('SCHOOL_PHONE') ?: '+234 703 354 6935 | +234 703 095 1884');
 define('SCHOOL_ADDRESS', getenv('SCHOOL_ADDRESS') ?: 'John Edia Str, Ankpa Qtrs Extension , Makurdi, Nigeria');
 
 /* ========================
