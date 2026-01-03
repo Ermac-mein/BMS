@@ -1204,13 +1204,13 @@ footer::before {
     line-height: 1.8;
 }
 
-/* Announcement Toast */
+/* Announcement Toast - Updated Position */
 .announcement-toast {
     position: fixed;
     top: 100px;
     right: 24px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
+    background: linear-gradient(135deg, var(--light), var(--light));
+    color: #222;
     padding: 18px 24px;
     border-radius: var(--radius);
     box-shadow: var(--shadow-xl);
@@ -1256,7 +1256,7 @@ footer::before {
 .announcement-close {
     background: none;
     border: none;
-    color: white;
+    color: #222;
     font-size: 1.3rem;
     cursor: pointer;
     opacity: 0.7;
@@ -1270,7 +1270,7 @@ footer::before {
 
 .announcement-close:hover {
     opacity: 1;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.1);
 }
 
 /* Modal */
@@ -1679,17 +1679,17 @@ footer::before {
         padding: 20px;
     }
     
+    /* Announcement Toast - Mobile Position Updated */
     .announcement-toast {
-        top: auto;
-        bottom: 24px;
+        top: 80px;
         right: 24px;
-        left: 24px;
-        max-width: none;
-        transform: translateY(120px);
+        left: auto;
+        max-width: 360px;
+        transform: translateX(400px);
     }
     
     .announcement-toast.show {
-        transform: translateY(0);
+        transform: translateX(0);
     }
 }
 

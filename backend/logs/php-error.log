@@ -1,0 +1,22 @@
+[03-Jan-2026 03:03:57 Africa/Lagos] Contact Request - Content-Type: application/json
+[03-Jan-2026 03:03:57 Africa/Lagos] Contact Request - Is JSON: YES
+[03-Jan-2026 03:03:57 Africa/Lagos] Contact Form Data: Array
+(
+    [name] => samuel samson
+    [email] => samuelson@example.com
+    [phone] => 08012345679
+    [subject] => General Inquiry
+    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees. Thank you
+)
+
+[03-Jan-2026 03:03:57 Africa/Lagos] Extracted Fields: Array
+(
+    [name] => samuel samson
+    [email] => samuelson@example.com
+    [phone] => 08012345679
+    [subject] => General Inquiry
+    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees. Thank you
+)
+
+[03-Jan-2026 03:03:57 Africa/Lagos] Contact saved with ID: 8
+[03-Jan-2026 03:04:03 Africa/Lagos] Contact email sent successfully

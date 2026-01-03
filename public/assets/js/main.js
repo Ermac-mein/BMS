@@ -262,10 +262,10 @@
                     iconColor: '#d97706'
                 },
                 info: { 
-                    bg: '#e0f2fe', 
-                    border: '#0ea5e9',
+                    bg: '#ffffff', 
+                    border: '#e5e7eb',
                     icon: 'ℹ',
-                    iconColor: '#0284c7'
+                    iconColor: '#4b5563'
                 },
                 welcome: { 
                     bg: '#ffffff', 
@@ -400,7 +400,7 @@
             // Show admission announcement after 1 minute
             setTimeout(() => {
                 this.show();
-            }, 60000); // 1 minute = 60000 milliseconds
+            }, 30000); // 30 seconds = 30000 milliseconds
             
             this.setupEventListeners();
         }
