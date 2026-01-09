@@ -1,22 +1,105 @@
-[03-Jan-2026 03:03:57 Africa/Lagos] Contact Request - Content-Type: application/json
-[03-Jan-2026 03:03:57 Africa/Lagos] Contact Request - Is JSON: YES
-[03-Jan-2026 03:03:57 Africa/Lagos] Contact Form Data: Array
+[09-Jan-2026 10:54:16 Africa/Lagos] Contact Request - Content-Type: application/json
+[09-Jan-2026 10:54:16 Africa/Lagos] Contact Request - Is JSON: YES
+[09-Jan-2026 10:54:16 Africa/Lagos] Contact Form Data: Array
 (
-    [name] => samuel samson
+    [name] => Samuel Samson
     [email] => samuelson@example.com
     [phone] => 08012345679
-    [subject] => General Inquiry
-    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees. Thank you
+    [subject] => Admission Inquiry
+    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees.
 )
 
-[03-Jan-2026 03:03:57 Africa/Lagos] Extracted Fields: Array
+[09-Jan-2026 10:54:16 Africa/Lagos] Extracted Fields: Array
 (
-    [name] => samuel samson
+    [name] => Samuel Samson
     [email] => samuelson@example.com
     [phone] => 08012345679
-    [subject] => General Inquiry
-    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees. Thank you
+    [subject] => Admission Inquiry
+    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees.
 )
 
-[03-Jan-2026 03:03:57 Africa/Lagos] Contact saved with ID: 8
-[03-Jan-2026 03:04:03 Africa/Lagos] Contact email sent successfully
+[09-Jan-2026 10:54:16 Africa/Lagos] Contact saved with ID: 12
+[09-Jan-2026 10:54:22 Africa/Lagos] Contact email sent successfully
+[09-Jan-2026 10:58:56 Africa/Lagos] Application Request - Content-Type: application/json
+[09-Jan-2026 10:58:56 Africa/Lagos] Application Request - Is JSON: YES
+[09-Jan-2026 10:58:56 Africa/Lagos] Application Form Data: Array
+(
+    [fullName] => Chinedu Okoro
+    [dob] => 2020-01-16
+    [religion] => Christianity
+    [gender] => Male
+    [classInterest] => Primary 4-6
+    [nationality] => Nigeria
+    [state] => Kaduna
+    [city] => Mahuta
+    [address] => opposite oando filling station
+    [studentPhone] => 2348012345678
+    [studentEmail] => chineduokoro@example.com
+    [motherName] => Chioma Okoro
+    [fatherName] => Emeka Okoro
+    [motherPhone] => 2349087654321
+    [fatherPhone] => 2348012345678
+    [parentEmail] => samuelson@example.com
+    [parentAddress] => opposite oando filling station
+)
+
+[09-Jan-2026 10:58:56 Africa/Lagos] Extracted Fields: Array
+(
+    [full_name] => Chinedu Okoro
+    [dob] => 2020-01-16
+    [religion] => Christianity
+    [class_interest] => Primary 4-6
+    [gender] => Male
+    [address] => opposite oando filling station
+    [nationality] => Nigeria
+    [state] => Kaduna
+    [city] => Mahuta
+    [student_phone] => 2348012345678
+    [student_email] => chineduokoro@example.com
+    [mother_name] => Chioma Okoro
+    [father_name] => Emeka Okoro
+    [mother_phone] => 2349087654321
+    [father_phone] => 2348012345678
+    [parent_email] => samuelson@example.com
+    [parent_address] => opposite oando filling station
+)
+
+[09-Jan-2026 10:58:56 Africa/Lagos] Application DB Data: Array
+(
+    [:full_name] => Chinedu Okoro
+    [:date_of_birth] => 2020-01-16
+    [:religion] => Christianity
+    [:class_interest] => Primary 4-6
+    [:gender] => Male
+    [:address] => opposite oando filling station
+    [:nationality] => Nigeria
+    [:state] => Kaduna
+    [:city] => Mahuta
+    [:student_phone] => 2348012345678
+    [:student_email] => chineduokoro@example.com
+    [:mother_name] => Chioma Okoro
+    [:father_name] => Emeka Okoro
+    [:mother_phone] => 2349087654321
+    [:father_phone] => 2348012345678
+    [:parent_email] => samuelson@example.com
+    [:parent_address] => opposite oando filling station
+    [:application_id] => APP202601090E0EB4
+)
+
+[09-Jan-2026 10:58:56 Africa/Lagos] Prepared SQL: 
+        INSERT INTO applications (
+            full_name, date_of_birth, religion, class_interest, gender, address,
+            nationality, state, city, student_phone, student_email, 
+            mother_name, father_name, mother_phone, father_phone, 
+            parent_email, parent_address,
+            submission_date, status, application_id
+        ) VALUES (
+            :full_name, :date_of_birth, :religion, :class_interest, :gender, :address,
+            :nationality, :state, :city, :student_phone, :student_email,
+            :mother_name, :father_name, :mother_phone, :father_phone,
+            :parent_email, :parent_address,
+            NOW(), 'pending', :application_id
+        )
+    
+[09-Jan-2026 10:58:56 Africa/Lagos] Application saved successfully. App ID: APP202601090E0EB4, DB ID: 3
+[09-Jan-2026 10:59:04 Africa/Lagos] Application email sent successfully for Application ID: APP202601090E0EB4

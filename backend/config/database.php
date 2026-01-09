@@ -135,8 +135,79 @@ function getDatabaseConnection(int $retries = 3, int $delaySeconds = 2): PDO
 }
 
 /* ========================
-   EMAIL SENDING
+   EMAIL SENDING - UPDATED FOR SENDER DISPLAY
 ======================== */
+function sendEmailFromUser(string $userEmail, string $userName, string $to, string $subject, string $body, bool $isHTML = true): bool
+{
+    // Check if PHPMailer is available
+    $phpmailerAvailable = class_exists('PHPMailer\PHPMailer\PHPMailer') &&
+        class_exists('PHPMailer\PHPMailer\SMTP') &&
+        class_exists('PHPMailer\PHPMailer\Exception');
+
+    if ($phpmailerAvailable) {
+        try {
+            $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+
+            // SMTP Configuration
+            $mail->isSMTP();
+            $mail->Host = SMTP_HOST;
+            $mail->SMTPAuth = true;
+            $mail->Username = SMTP_USER;
+            $mail->Password = SMTP_PASS;
+            $mail->SMTPSecure = SMTP_SECURE;
+            $mail->Port = SMTP_PORT;
+            $mail->CharSet = 'UTF-8';
+
+            // Set sender as the user (for inbox display)
+            if (filter_var($userEmail, FILTER_VALIDATE_EMAIL)) {
+                $mail->setFrom($userEmail, $userName);
+                // Add school as Reply-To for internal tracking
+                $mail->addReplyTo(SMTP_FROM, SMTP_FROM_NAME);
+            } else {
+                $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
+            }
+
+            // Recipients
+            $mail->addAddress($to);
+
+            // Email content
+            $mail->isHTML($isHTML);
+            $mail->Subject = $subject;
+
+            if ($isHTML) {
+                $mail->Body = $body . getEmailSignature(true);
+                $mail->AltBody = strip_tags($body) . getEmailSignature(false);
+            } else {
+                $mail->Body = $body . getEmailSignature(false);
+            }
+
+            // SMTP Debugging for development
+            if (APP_DEBUG) {
+                $mail->SMTPDebug = 2;
+                $mail->Debugoutput = function ($str, $level) {
+                    error_log("PHPMailer: $str");
+                };
+            }
+
+            // Send email
+            if ($mail->send()) {
+                return true;
+            } else {
+                error_log('PHPMailer Error: Send failed for user email: ' . $userEmail);
+                return false;
+            }
+
+        } catch (Exception $e) {
+            error_log('PHPMailer Exception for user email ' . $userEmail . ': ' . $e->getMessage());
+            // Fall back to sending from school
+            return sendEmail($to, $subject, $body, $isHTML, $userEmail);
+        }
+    }
+
+    // Fallback to native mail function
+    return sendEmailNative($to, $subject, $body, $isHTML, $userEmail);
+}
+
 function sendEmail(string $to, string $subject, string $body, bool $isHTML = true, string $replyTo = '', array $cc = [], array $bcc = []): bool
 {
     // Check if PHPMailer is available
@@ -158,15 +229,7 @@ function sendEmail(string $to, string $subject, string $body, bool $isHTML = tru
             $mail->Port = SMTP_PORT;
             $mail->CharSet = 'UTF-8';
 
-            // SMTP Debugging for development
-            if (APP_DEBUG) {
-                $mail->SMTPDebug = 2;
-                $mail->Debugoutput = function ($str, $level) {
-                    error_log("PHPMailer: $str");
-                };
-            }
-
-            // From address
+            // From address (school)
             $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
 
             // Recipients
@@ -196,6 +259,14 @@ function sendEmail(string $to, string $subject, string $body, bool $isHTML = tru
                 $mail->AltBody = strip_tags($body) . getEmailSignature(false);
             } else {
                 $mail->Body = $body . getEmailSignature(false);
+            }
+
+            // SMTP Debugging for development
+            if (APP_DEBUG) {
+                $mail->SMTPDebug = 2;
+                $mail->Debugoutput = function ($str, $level) {
+                    error_log("PHPMailer: $str");
+                };
             }
 
             // Send email
@@ -369,7 +440,4 @@ function normalizePhone(string $phone): string
 
     return $phone; // Return original if can't normalize
 }
-
-// REMOVED: jsonResponse() function to prevent redeclaration errors
-// Each form handler now has its own inline JSON response handling
 ?>

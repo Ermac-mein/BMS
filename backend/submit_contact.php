@@ -171,23 +171,18 @@ function normalizePhoneWithPlus(string $phone): string
 
     $phone = trim($phone);
     
-    // Remove any existing + sign for processing
     $phone = ltrim($phone, '+');
     
-    // Extract digits only
     $digits = preg_replace('/\D/', '', $phone);
     
     if (empty($digits)) {
         return '';
     }
 
-    // If it's 11 digits and starts with 0 (Nigeria), convert to 234
     if (strlen($digits) === 11 && strpos($digits, '0') === 0) {
         return '234' . substr($digits, 1);
     }
     
-    // If it's 10 digits and doesn't start with 0, assume it's already country code + number
-    // For example, 233xxxxxxxx (Ghana) or 234xxxxxxxx (Nigeria)
     if (strlen($digits) >= 10 && strlen($digits) <= 15) {
         return $digits;
     }
@@ -291,44 +286,92 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $mail->SMTPSecure = defined('SMTP_SECURE') ? constant('SMTP_SECURE') : 'tls';
         $mail->Port = defined('SMTP_PORT') ? constant('SMTP_PORT') : 587;
 
-        $mail->setFrom(SMTP_FROM, 'Beautiful Minds Schools');
-        $mail->addAddress(SMTP_FROM);
-
+        // IMPORTANT: Always send FROM your school email
+        // Trying to send FROM user's email will fail on Gmail/Google SMTP
+        $mail->setFrom(SMTP_FROM, 'Beautiful Minds Schools Contact Form');
+        
+        // Set user as Reply-To so replies go to them
         if (filter_var($fields['email'], FILTER_VALIDATE_EMAIL)) {
             $mail->addReplyTo($fields['email'], $fields['name']);
         }
-
-        $mail->isHTML(true);
-        $mail->Subject = "New Contact Message: " . $dbSubject;
-
-        $body = "<h3>New Contact Form Submission</h3>";
-        $body .= "<p><strong>Name:</strong> {$dbName}</p>";
-        $body .= "<p><strong>Email:</strong> {$dbEmail}</p>";
-
-        if (!empty($displayPhone)) {
-            $body .= "<p><strong>Phone:</strong> {$displayPhone}</p>";
+        
+        $mail->addAddress(SMTP_FROM); // Send to school
+        
+        // Also send to an alternate admin email if different from SMTP_FROM
+        if (defined('ADMIN_EMAIL') && ADMIN_EMAIL && ADMIN_EMAIL !== SMTP_FROM) {
+            $mail->addAddress(ADMIN_EMAIL);
         }
 
-        $body .= "<p><strong>Subject:</strong> {$dbSubject}</p>";
-        $body .= "<p><strong>Message:</strong></p>";
-        $body .= "<div style='background: #f5f5f5; padding: 15px; border-radius: 5px;'>";
+        // Format subject to show it's from the user
+        $mail->isHTML(true);
+        $mail->Subject = "[Contact Form] From: " . $dbName . " - " . $dbSubject;
+
+        $body = "<h3 style='color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;'>New Contact Form Submission</h3>";
+        
+        $body .= "<div style='background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;'>";
+        $body .= "<p style='margin: 5px 0;'><strong>Submitted:</strong> " . date('F j, Y, g:i a') . "</p>";
+        $body .= "<p style='margin: 5px 0;'><strong>Contact ID:</strong> <code>$contactId</code></p>";
+        $body .= "<p style='margin: 5px 0;'><strong>Message From:</strong> " . $dbName . " &lt;" . $dbEmail . "&gt;</p>";
+        $body .= "</div>";
+        
+        $body .= "<h4 style='color: #2c3e50;'>Contact Information</h4>";
+        $body .= "<table style='width: 100%; border-collapse: collapse; margin-bottom: 20px;'>";
+        $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Name</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>{$dbName}</td></tr>";
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Email</strong></td><td style='padding: 10px; border: 1px solid #ddd;'><a href='mailto:{$dbEmail}'>{$dbEmail}</a></td></tr>";
+        
+        if (!empty($displayPhone)) {
+            $body .= "<tr style='background-color: #f2f2f2;'><td style='padding: 10px; border: 1px solid #ddd;'><strong>Phone</strong></td><td style='padding: 10px; border: 1px solid #ddd;'><a href='tel:{$displayPhone}'>{$displayPhone}</a></td></tr>";
+        }
+        
+        $body .= "<tr><td style='padding: 10px; border: 1px solid #ddd;'><strong>Subject</strong></td><td style='padding: 10px; border: 1px solid #ddd;'>{$dbSubject}</td></tr>";
+        $body .= "</table>";
+        
+        $body .= "<h4 style='color: #2c3e50;'>Message</h4>";
+        $body .= "<div style='background: #f5f5f5; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db;'>";
         $body .= nl2br($dbMessage);
         $body .= "</div>";
+        
+        $body .= "<div style='background: #e8f4fc; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; margin-top: 20px;'>";
+        $body .= "<p style='margin: 0;'><strong>Quick Actions:</strong></p>";
+        $body .= "<ul style='margin: 10px 0 0 0; padding-left: 20px;'>";
+        $body .= "<li><a href='mailto:{$dbEmail}?subject=Re: {$dbSubject}'>Reply to {$dbName}</a></li>";
+        if (!empty($displayPhone)) {
+            $body .= "<li><a href='tel:{$displayPhone}'>Call {$dbName}</a></li>";
+        }
+        $body .= "</ul>";
+        $body .= "</div>";
+        
+        $body .= "<p style='color: #7f8c8d; font-size: 12px; margin-top: 20px; border-top: 1px solid #ecf0f1; padding-top: 10px;'>";
+        $body .= "This email was automatically generated by the Beautiful Minds Schools contact form.";
+        $body .= "</p>";
 
         $mail->Body = $body;
         
         // Plain text version
-        $plainBody = "New Contact Form Submission\n";
+        $plainBody = "NEW CONTACT FORM SUBMISSION\n";
         $plainBody .= "============================\n\n";
+        $plainBody .= "Submitted: " . date('F j, Y, g:i a') . "\n";
+        $plainBody .= "Contact ID: $contactId\n";
+        $plainBody .= "Message From: " . $dbName . " <" . $dbEmail . ">\n\n";
+        
+        $plainBody .= "CONTACT INFORMATION\n";
+        $plainBody .= "-------------------\n";
         $plainBody .= "Name: {$dbName}\n";
         $plainBody .= "Email: {$dbEmail}\n";
         if (!empty($displayPhone)) {
             $plainBody .= "Phone: {$displayPhone}\n";
         }
-        $plainBody .= "Subject: {$dbSubject}\n";
-        $plainBody .= "\nMessage:\n";
-        $plainBody .= "--------\n";
-        $plainBody .= strip_tags($dbMessage) . "\n";
+        $plainBody .= "Subject: {$dbSubject}\n\n";
+        
+        $plainBody .= "MESSAGE\n";
+        $plainBody .= "-------\n";
+        $plainBody .= strip_tags($dbMessage) . "\n\n";
+        
+        $plainBody .= "QUICK ACTIONS:\n";
+        $plainBody .= "* Reply to: {$dbEmail}\n";
+        if (!empty($displayPhone)) {
+            $plainBody .= "* Call: {$displayPhone}\n";
+        }
         
         $mail->AltBody = $plainBody;
 

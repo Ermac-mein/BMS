@@ -269,22 +269,18 @@ function normalizePhoneWithPlus(string $phone): string
 
     $phone = trim($phone);
 
-    // Remove any existing + sign for processing
     $phone = ltrim($phone, '+');
 
-    // Extract digits only
     $digits = preg_replace('/\D/', '', $phone);
 
     if (empty($digits)) {
         return '';
     }
 
-    // If it's 11 digits and starts with 0 (Nigeria), convert to 234
     if (strlen($digits) === 11 && strpos($digits, '0') === 0) {
         return '234' . substr($digits, 1);
     }
 
-    // If it's 10 digits and doesn't start with 0, assume it's already country code + number
     if (strlen($digits) >= 10 && strlen($digits) <= 15) {
         return $digits;
     }
@@ -430,23 +426,34 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $mail->SMTPSecure = defined('SMTP_SECURE') ? constant('SMTP_SECURE') : 'tls';
         $mail->Port = defined('SMTP_PORT') ? constant('SMTP_PORT') : 587;
 
-        $mail->setFrom(SMTP_FROM, 'Beautiful Minds Schools');
-        $mail->addAddress(SMTP_FROM);
-
+        // IMPORTANT: Always send FROM your school email
+        $mail->setFrom(SMTP_FROM, 'Beautiful Minds Schools Admissions');
+        
+        // Set parent as Reply-To so replies go to them
         if (filter_var($fields['parent_email'], FILTER_VALIDATE_EMAIL)) {
-            $mail->addReplyTo($fields['parent_email'], $fields['full_name'] . "'s Parent");
+            $mail->addReplyTo($fields['parent_email'], $fields['mother_name'] ?: $fields['father_name'] ?: $fields['full_name'] . "'s Parent");
+        }
+        
+        $mail->addAddress(SMTP_FROM); // Send to school
+        
+        // Also send to an alternate admin email if different from SMTP_FROM
+        if (defined('ADMIN_EMAIL') && ADMIN_EMAIL && ADMIN_EMAIL !== SMTP_FROM) {
+            $mail->addAddress(ADMIN_EMAIL);
         }
 
+        // Format subject to clearly show it's an application from the student
         $mail->isHTML(true);
-        $mail->Subject = "New Application Submitted: {$applicationId} - " . htmlspecialchars($fields['full_name']);
+        $mail->Subject = "[Application] " . htmlspecialchars($fields['full_name']) . " - " . htmlspecialchars($fields['class_interest']) . " - {$applicationId}";
 
         $body = "<h3 style='color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;'>
                 New Student Application - {$applicationId}</h3>";
 
         $body .= "<div style='background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;'>";
         $body .= "<h4 style='color: #2c3e50; margin-top: 0;'>Application Summary</h4>";
-        $body .= "<p><strong>Submission Time:</strong> " . date('F j, Y, g:i a') . "</p>";
-        $body .= "<p><strong>Application ID:</strong> <code>{$applicationId}</code></p>";
+        $body .= "<p style='margin: 5px 0;'><strong>Submission Time:</strong> " . date('F j, Y, g:i a') . "</p>";
+        $body .= "<p style='margin: 5px 0;'><strong>Application ID:</strong> <code>{$applicationId}</code></p>";
+        $body .= "<p style='margin: 5px 0;'><strong>Applied For:</strong> " . htmlspecialchars($fields['class_interest']) . "</p>";
+        $body .= "<p style='margin: 5px 0;'><strong>Submitted By:</strong> " . htmlspecialchars($fields['mother_name']) . "/" . htmlspecialchars($fields['father_name']) . " &lt;" . htmlspecialchars($fields['parent_email']) . "&gt;</p>";
         $body .= "</div>";
 
         $body .= "<h4 style='color: #2c3e50;'>Student Information</h4>";
@@ -485,10 +492,11 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $body .= "</table>";
 
         $body .= "<div style='background: #e8f4fc; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; margin-top: 20px;'>";
-        $body .= "<p style='margin: 0;'><strong>Next Steps:</strong></p>";
+        $body .= "<p style='margin: 0;'><strong>Quick Actions:</strong></p>";
         $body .= "<ul style='margin: 10px 0 0 0; padding-left: 20px;'>";
-        $body .= "<li>Contact parent at: " . $displayMotherPhone . " (Mother) or " . $displayFatherPhone . " (Father)</li>";
-        $body .= "<li>Follow up via email: " . htmlspecialchars($fields['parent_email']) . "</li>";
+        $body .= "<li><a href='mailto:" . htmlspecialchars($fields['parent_email']) . "?subject=Regarding Application: {$applicationId}'>Email Parents</a></li>";
+        $body .= "<li><a href='tel:{$displayMotherPhone}'>Call Mother: {$displayMotherPhone}</a></li>";
+        $body .= "<li><a href='tel:{$displayFatherPhone}'>Call Father: {$displayFatherPhone}</a></li>";
         $body .= "</ul>";
         $body .= "</div>";
 
@@ -502,6 +510,8 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $plainBody .= "=======================\n\n";
         $plainBody .= "Application ID: {$applicationId}\n";
         $plainBody .= "Submission Time: " . date('F j, Y, g:i a') . "\n";
+        $plainBody .= "Applied For: " . $fields['class_interest'] . "\n";
+        $plainBody .= "Submitted By: " . $fields['mother_name'] . "/" . $fields['father_name'] . " <" . $fields['parent_email'] . ">\n\n";
 
         $plainBody .= "STUDENT INFORMATION\n";
         $plainBody .= "-------------------\n";
@@ -535,9 +545,10 @@ if (defined('SMTP_HOST') && SMTP_HOST && defined('SMTP_FROM') && SMTP_FROM) {
         $plainBody .= "Parent Email: " . $fields['parent_email'] . "\n";
         $plainBody .= "Parent Address: " . $fields['parent_address'] . "\n\n";
 
-        $plainBody .= "NEXT STEPS:\n";
-        $plainBody .= "* Contact parent at: " . $displayMotherPhone . " (Mother) or " . $displayFatherPhone . " (Father)\n";
-        $plainBody .= "* Follow up via email: " . $fields['parent_email'] . "\n";
+        $plainBody .= "QUICK ACTIONS:\n";
+        $plainBody .= "* Email Parents: " . $fields['parent_email'] . "\n";
+        $plainBody .= "* Call Mother: " . $displayMotherPhone . "\n";
+        $plainBody .= "* Call Father: " . $displayFatherPhone . "\n";
 
         $mail->AltBody = $plainBody;
 
