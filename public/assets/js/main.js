@@ -1147,10 +1147,10 @@
                 }
 
                 // Log request details for debugging
-                utils.logRequestHeaders(this.endpoint, processedData, {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                });
+                // utils.logRequestHeaders(this.endpoint, processedData, {
+                //     'Content-Type': 'application/json',
+                //     'Accept': 'application/json'
+                // });
 
                 const result = await this.apiRequest(processedData);
                 

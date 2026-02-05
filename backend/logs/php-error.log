@@ -1,92 +1,114 @@
-[09-Jan-2026 10:54:16 Africa/Lagos] Contact Request - Content-Type: application/json
-[09-Jan-2026 10:54:16 Africa/Lagos] Contact Request - Is JSON: YES
-[09-Jan-2026 10:54:16 Africa/Lagos] Contact Form Data: Array
+[13-Jan-2026 10:57:52 Africa/Lagos] Contact Request - Content-Type: application/json
+[13-Jan-2026 10:57:52 Africa/Lagos] Contact Request - Is JSON: YES
+[13-Jan-2026 10:57:52 Africa/Lagos] Contact Form Data: Array
 (
-    [name] => Samuel Samson
+    [name] => samuel samson
     [email] => samuelson@example.com
-    [phone] => 08012345679
+    [phone] => 08012345678
     [subject] => Admission Inquiry
-    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees.
+    [message] => Just want to know the admission requirements for the school and school fees. Thank you.
 )
 
-[09-Jan-2026 10:54:16 Africa/Lagos] Extracted Fields: Array
+[13-Jan-2026 10:57:52 Africa/Lagos] Extracted Fields: Array
 (
-    [name] => Samuel Samson
+    [name] => samuel samson
     [email] => samuelson@example.com
-    [phone] => 08012345679
+    [phone] => 08012345678
     [subject] => Admission Inquiry
-    [message] => Hello, I would like information about admissions for the next term. Please advise on requirements and fees.
+    [message] => Just want to know the admission requirements for the school and school fees. Thank you.
 )
 
-[09-Jan-2026 10:54:16 Africa/Lagos] Contact saved with ID: 12
-[09-Jan-2026 10:54:22 Africa/Lagos] Contact email sent successfully
-[09-Jan-2026 10:58:56 Africa/Lagos] Application Request - Content-Type: application/json
-[09-Jan-2026 10:58:56 Africa/Lagos] Application Request - Is JSON: YES
-[09-Jan-2026 10:58:56 Africa/Lagos] Application Form Data: Array
+[13-Jan-2026 10:57:52 Africa/Lagos] Contact saved with ID: 13
+[13-Jan-2026 10:57:52 Africa/Lagos] Email sending failed: SMTP Error: Could not connect to SMTP host. Failed to connect to server
+[05-Feb-2026 12:44:28 Africa/Lagos] Contact Request - Content-Type: application/json
+[05-Feb-2026 12:44:28 Africa/Lagos] Contact Request - Is JSON: YES
+[05-Feb-2026 12:44:28 Africa/Lagos] Contact Form Data: Array
 (
-    [fullName] => Chinedu Okoro
-    [dob] => 2020-01-16
+    [name] => John Doe
+    [email] => johndoe1@gmail.com
+    [phone] => +23490987654342
+    [subject] => Admission Enquiry
+    [message] => Please i am asking in regards to school fees and educational forums. thank you
+)
+
+[05-Feb-2026 12:44:28 Africa/Lagos] Extracted Fields: Array
+(
+    [name] => John Doe
+    [email] => johndoe1@gmail.com
+    [phone] => +23490987654342
+    [subject] => Admission Enquiry
+    [message] => Please i am asking in regards to school fees and educational forums. thank you
+)
+
+[05-Feb-2026 12:44:28 Africa/Lagos] Contact saved with ID: 14
+[05-Feb-2026 12:44:32 Africa/Lagos] Contact email sent successfully
+[05-Feb-2026 12:46:40 Africa/Lagos] Application Request - Content-Type: application/json
+[05-Feb-2026 12:46:40 Africa/Lagos] Application Request - Is JSON: YES
+[05-Feb-2026 12:46:40 Africa/Lagos] Application Form Data: Array
+(
+    [fullName] => John Doe
+    [dob] => 2018-02-05
     [religion] => Christianity
     [gender] => Male
-    [classInterest] => Primary 4-6
+    [classInterest] => Primary 1-3
     [nationality] => Nigeria
     [state] => Kaduna
-    [city] => Mahuta
-    [address] => opposite oando filling station
-    [studentPhone] => 2348012345678
-    [studentEmail] => chineduokoro@example.com
-    [motherName] => Chioma Okoro
-    [fatherName] => Emeka Okoro
-    [motherPhone] => 2349087654321
-    [fatherPhone] => 2348012345678
-    [parentEmail] => samuelson@example.com
-    [parentAddress] => opposite oando filling station
+    [city] => Sabo
+    [address] => opposite valid filling station, ugwan pama sabo
+    [studentPhone] => 23490876565432
+    [studentEmail] => 
+    [motherName] => Martha Doe
+    [fatherName] => James Doe
+    [motherPhone] => 23490876565432
+    [fatherPhone] => 23490876565432
+    [parentEmail] => parent.example@gmail.com
+    [parentAddress] => opposite valid filling station, ugwan pama sabo
 )
 
-[09-Jan-2026 10:58:56 Africa/Lagos] Extracted Fields: Array
+[05-Feb-2026 12:46:40 Africa/Lagos] Extracted Fields: Array
 (
-    [full_name] => Chinedu Okoro
-    [dob] => 2020-01-16
+    [full_name] => John Doe
+    [dob] => 2018-02-05
     [religion] => Christianity
-    [class_interest] => Primary 4-6
+    [class_interest] => Primary 1-3
     [gender] => Male
-    [address] => opposite oando filling station
+    [address] => opposite valid filling station, ugwan pama sabo
     [nationality] => Nigeria
     [state] => Kaduna
-    [city] => Mahuta
-    [student_phone] => 2348012345678
-    [student_email] => chineduokoro@example.com
-    [mother_name] => Chioma Okoro
-    [father_name] => Emeka Okoro
-    [mother_phone] => 2349087654321
-    [father_phone] => 2348012345678
-    [parent_email] => samuelson@example.com
-    [parent_address] => opposite oando filling station
+    [city] => Sabo
+    [student_phone] => 23490876565432
+    [student_email] => 
+    [mother_name] => Martha Doe
+    [father_name] => James Doe
+    [mother_phone] => 23490876565432
+    [father_phone] => 23490876565432
+    [parent_email] => parent.example@gmail.com
+    [parent_address] => opposite valid filling station, ugwan pama sabo
 )
 
-[09-Jan-2026 10:58:56 Africa/Lagos] Application DB Data: Array
+[05-Feb-2026 12:46:40 Africa/Lagos] Application DB Data: Array
 (
-    [:full_name] => Chinedu Okoro
-    [:date_of_birth] => 2020-01-16
+    [:full_name] => John Doe
+    [:date_of_birth] => 2018-02-05
     [:religion] => Christianity
-    [:class_interest] => Primary 4-6
+    [:class_interest] => Primary 1-3
     [:gender] => Male
-    [:address] => opposite oando filling station
+    [:address] => opposite valid filling station, ugwan pama sabo
     [:nationality] => Nigeria
     [:state] => Kaduna
-    [:city] => Mahuta
-    [:student_phone] => 2348012345678
-    [:student_email] => chineduokoro@example.com
-    [:mother_name] => Chioma Okoro
-    [:father_name] => Emeka Okoro
-    [:mother_phone] => 2349087654321
-    [:father_phone] => 2348012345678
-    [:parent_email] => samuelson@example.com
-    [:parent_address] => opposite oando filling station
-    [:application_id] => APP202601090E0EB4
+    [:city] => Sabo
+    [:student_phone] => 23490876565432
+    [:student_email] => 
+    [:mother_name] => Martha Doe
+    [:father_name] => James Doe
+    [:mother_phone] => 23490876565432
+    [:father_phone] => 23490876565432
+    [:parent_email] => parent.example@gmail.com
+    [:parent_address] => opposite valid filling station, ugwan pama sabo
+    [:application_id] => APP202602050E7D83
 )
 
-[09-Jan-2026 10:58:56 Africa/Lagos] Prepared SQL: 
+[05-Feb-2026 12:46:40 Africa/Lagos] Prepared SQL: 
         INSERT INTO applications (
             full_name, date_of_birth, religion, class_interest, gender, address,
             nationality, state, city, student_phone, student_email, 
@@ -101,5 +123,5 @@
             NOW(), 'pending', :application_id
         )
     
-[09-Jan-2026 10:58:56 Africa/Lagos] Application saved successfully. App ID: APP202601090E0EB4, DB ID: 3
-[09-Jan-2026 10:59:04 Africa/Lagos] Application email sent successfully for Application ID: APP202601090E0EB4
+[05-Feb-2026 12:46:40 Africa/Lagos] Application saved successfully. App ID: APP202602050E7D83, DB ID: 4
+[05-Feb-2026 12:46:45 Africa/Lagos] Application email sent successfully for Application ID: APP202602050E7D83
