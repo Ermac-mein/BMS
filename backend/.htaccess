@@ -1,1 +1,15 @@
-Deny from all
+# Prevent directory listing
+Options -Indexes
+
+# Deny access to sensitive files and directories
+<FilesMatch "^(database\.php|env_loader\.php|\.env|composer\.json|composer\.lock)$">
+    Require all denied
+</FilesMatch>
+
+<FilesMatch "\.(log|sql|ini|git)$">
+    Require all denied
+</FilesMatch>
+
+# Protect the config and logs directories specifically if accessed directly
+RewriteEngine On
+RewriteRule ^(config|logs|vendor)/ - [F,L]
